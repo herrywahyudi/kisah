@@ -489,6 +489,86 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
 /* topbar logo serif */
 .topbar-logo{font-family:var(--serif) !important;}
 
+
+/* ── MUSIC PICKER ── */
+#music-picker{ margin-top:12px; animation:fadeIn .3s ease; }
+
+.music-picker-box{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border2);
+  border-radius:6px;overflow:hidden;
+}
+
+.mp-tabs{
+  display:flex;border-bottom:1px solid var(--border);
+}
+.mp-tab{
+  flex:1;padding:9px 0;font-family:var(--display);font-size:10px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  background:transparent;border:none;color:var(--muted);cursor:pointer;
+  transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-1px;
+}
+.mp-tab:hover{color:var(--sub);}
+.mp-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+.mp-pane{ padding:10px; }
+
+.preset-list{ display:flex;flex-direction:column;gap:4px; }
+.preset-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:4px;cursor:pointer;
+  border:1px solid transparent;transition:all .2s;
+}
+.preset-item:hover{ background:rgba(255,255,255,0.04);border-color:var(--border); }
+.preset-item.selected{ background:var(--gold-dim);border-color:var(--gold-mid); }
+.preset-icon{ font-size:16px;flex-shrink:0;width:24px;text-align:center; }
+.preset-info{ flex:1;min-width:0; }
+.preset-name{ font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.preset-mood{ font-size:10px;color:var(--muted);font-style:italic;margin-top:1px; }
+.preset-check{
+  font-size:10px;color:var(--gold);opacity:0;
+  flex-shrink:0;transition:opacity .2s;
+}
+.preset-item.selected .preset-check{ opacity:1; }
+
+.yt-input-wrap{ margin-bottom:12px; }
+.yt-preview-card{
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  border-radius:6px;overflow:hidden;margin-top:10px;
+}
+.yt-thumb-wrap{ position:relative; }
+.yt-thumb-wrap::after{
+  content:'▶';position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-size:24px;color:rgba(255,255,255,.7);
+  background:rgba(0,0,0,.3);opacity:0;transition:opacity .2s;
+}
+.yt-thumb-wrap:hover::after{ opacity:1; }
+.yt-preview-info{ padding:10px 12px; }
+.yt-preview-title{
+  font-size:12px;color:var(--text);font-weight:500;
+  margin-bottom:4px;line-height:1.4;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.yt-preview-id{ font-size:10px;color:var(--muted);font-family:monospace;margin-bottom:10px; }
+.yt-use-btn{
+  width:100%;padding:8px;background:var(--gold);color:#0a0907;
+  border:none;font-family:var(--display);font-size:10px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;border-radius:3px;cursor:pointer;
+  transition:all .2s;
+}
+.yt-use-btn:hover{ background:#e0c080; }
+
+.now-playing{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;border-top:1px solid var(--border);
+  font-size:11px;color:var(--muted);font-style:italic;
+}
+.np-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--gold);
+  flex-shrink:0;animation:npPulse 1.4s ease-in-out infinite;
+}
+@keyframes npPulse{0%,100%{opacity:.4;transform:scale(1);}50%{opacity:1;transform:scale(1.3);}}
+
 /* ── ANIMATIONS ── */
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 .step-panel.active{animation:fadeIn 0.3s ease;}
@@ -747,6 +827,92 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
           <span class="toggle-label">🎵 Musik Latar</span>
           <div class="toggle" id="tog-music" onclick="togFeature('music',this)"></div>
         </div>
+        <div id="music-picker" style="display:none">
+          <div class="music-picker-box">
+            <div class="mp-tabs">
+              <button class="mp-tab active" onclick="switchMusicTab('preset',this)">Pilihan Kami</button>
+              <button class="mp-tab" onclick="switchMusicTab('youtube',this)">YouTube</button>
+            </div>
+
+            <!-- PRESET SONGS -->
+            <div id="mp-preset" class="mp-pane">
+              <div class="preset-list" id="presetList">
+                <div class="preset-item selected" onclick="selectPreset(this,'jfKfPfyJRdk','Lofi Study — Dreamy Beats')">
+                  <div class="preset-icon">🎵</div>
+                  <div class="preset-info"><div class="preset-name">Lofi Study</div><div class="preset-mood">Dreamy &amp; Soft</div></div>
+                  <div class="preset-check">✓</div>
+                </div>
+                <div class="preset-item" onclick="selectPreset(this,'HuFYqnbVbzY','Morning Garden — Acoustic')">
+                  <div class="preset-icon">🌸</div>
+                  <div class="preset-info"><div class="preset-name">Morning Garden</div><div class="preset-mood">Acoustic &amp; Warm</div></div>
+                  <div class="preset-check">✓</div>
+                </div>
+                <div class="preset-item" onclick="selectPreset(this,'4To1HTe_7GQ','Passionate Strings — Orchestral')">
+                  <div class="preset-icon">🎻</div>
+                  <div class="preset-info"><div class="preset-name">Passionate Strings</div><div class="preset-mood">Orchestral &amp; Deep</div></div>
+                  <div class="preset-check">✓</div>
+                </div>
+                <div class="preset-item" onclick="selectPreset(this,'Dxx6YCosP9c','Dreamy Nights — Lofi Chill')">
+                  <div class="preset-icon">🌙</div>
+                  <div class="preset-info"><div class="preset-name">Dreamy Nights</div><div class="preset-mood">Lofi &amp; Nostalgic</div></div>
+                  <div class="preset-check">✓</div>
+                </div>
+                <div class="preset-item" onclick="selectPreset(this,'UfcAVejslrU','Gamelan Senja — Bali Ambient')">
+                  <div class="preset-icon">🌿</div>
+                  <div class="preset-info"><div class="preset-name">Gamelan Senja</div><div class="preset-mood">Bali &amp; Tropical</div></div>
+                  <div class="preset-check">✓</div>
+                </div>
+                <div class="preset-item" onclick="selectPreset(this,'UiTzCQd3FGk','Silent Piano — Minimal')">
+                  <div class="preset-icon">🎹</div>
+                  <div class="preset-info"><div class="preset-name">Silent Piano</div><div class="preset-mood">Minimal &amp; Pure</div></div>
+                  <div class="preset-check">✓</div>
+                </div>
+                <div class="preset-item" onclick="selectPreset(this,'EhxqpnlGrBg','Golden Age — Jazz Piano')">
+                  <div class="preset-icon">✨</div>
+                  <div class="preset-info"><div class="preset-name">Golden Age</div><div class="preset-mood">Vintage &amp; Timeless</div></div>
+                  <div class="preset-check">✓</div>
+                </div>
+                <div class="preset-item" onclick="selectPreset(this,'aXItOY0sLRY','Star Drift — Ethereal')">
+                  <div class="preset-icon">🌌</div>
+                  <div class="preset-info"><div class="preset-name">Star Drift</div><div class="preset-mood">Ethereal &amp; Celestial</div></div>
+                  <div class="preset-check">✓</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- YOUTUBE INPUT -->
+            <div id="mp-youtube" class="mp-pane" style="display:none">
+              <div class="yt-input-wrap">
+                <div class="field-label" style="margin-bottom:8px">Paste link YouTube</div>
+                <input class="field-input" id="ytUrlInput"
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  oninput="previewYT(this.value)">
+                <div class="field-hint">Salin link lagu favorit kalian dari YouTube</div>
+              </div>
+              <div id="ytPreview" style="display:none">
+                <div class="yt-preview-card">
+                  <div class="yt-thumb-wrap">
+                    <img id="ytThumb" src="" style="width:100%;border-radius:4px;display:block;">
+                  </div>
+                  <div class="yt-preview-info">
+                    <div class="yt-preview-title" id="ytTitle">—</div>
+                    <div class="yt-preview-id" id="ytIdDisplay"></div>
+                    <button class="yt-use-btn" onclick="useYouTubeUrl()">✓ Gunakan Lagu Ini</button>
+                  </div>
+                </div>
+              </div>
+              <div id="ytError" style="display:none;font-size:11px;color:#e06060;margin-top:8px;font-style:italic;">
+                Link tidak valid. Pastikan format: youtube.com/watch?v=...
+              </div>
+            </div>
+
+            <!-- NOW PLAYING -->
+            <div class="now-playing" id="nowPlaying">
+              <span class="np-dot"></span>
+              <span id="npTitle">Lofi Study — Dreamy Beats</span>
+            </div>
+          </div>
+        </div>
         <div class="toggle-row">
           <span class="toggle-label">🗺 Google Maps</span>
           <div class="toggle on" id="tog-maps" onclick="togFeature('maps',this)"></div>
@@ -868,7 +1034,11 @@ var state = {
   photos: { groomPhoto: null, bridePhoto: null },
   _cdInterval: null,
   _renderDebounce: null,
-  _lastTheme: null
+  _lastTheme: null,
+  music: {
+    ytId: 'jfKfPfyJRdk',
+    title: 'Lofi Study — Dreamy Beats'
+  }
 };
 
 var themeNames = {
@@ -914,6 +1084,10 @@ function prevStep() { if (state.step > 1) goStep(state.step - 1); }
 function togFeature(key, el) {
   state.features[key] = !state.features[key];
   el.classList.toggle('on', state.features[key]);
+  if (key === 'music') {
+    var picker = document.getElementById('music-picker');
+    if (picker) picker.style.display = state.features.music ? 'block' : 'none';
+  }
   render();
 }
 
@@ -1148,22 +1322,14 @@ function _doRender() {
     ].join('')+'</div></section>';
 
   // ── MUSIC BAR ──
-  var songNames = {
-    aesthetic:'Purple Dream — Ambient',
-    cottagecore:'Morning Garden — Acoustic',
-    darkromance:'Passionate Strings — Orchestral',
-    y2k:'Dreamy Nights — Lofi',
-    bali:'Gamelan Senja — Tropical',
-    minimalist:'Silence & Piano — Minimal',
-    vintage:'Golden Age — Jazz Piano',
-    celestial:'Star Drift — Ethereal'
-  };
-  var musicHtml = '<div class="music-player" id="musicPlayer">' +
+  var musicHtml = state.features.music ? (
+    '<div class="music-player" id="musicPlayer">' +
     '<button class="mp-play" id="mpPlayBtn" onclick="toggleMusic()"><span id="mpIcon">▶</span></button>' +
     '<div class="mp-bars" id="mpBars"><span></span><span></span><span></span><span></span></div>' +
-    '<span class="mp-title" id="mpTitle">' + (songNames[state.theme]||'Wedding Ambient') + '</span>' +
-    '<button class="mp-play" onclick="toggleMusic()" style="font-size:9px;letter-spacing:1px;width:auto;padding:0 8px;border-radius:2px;opacity:0.6" id="mpMuteBtn">Musik</button>' +
-  '</div>';
+    '<span class="mp-title" id="mpTitle">' + (state.music.title || 'Wedding Ambient') + '</span>' +
+    '<button class="mp-play" onclick="toggleMusic()" style="font-size:9px;letter-spacing:1px;width:auto;padding:0 8px;border-radius:2px;opacity:0.6" id="mpMuteBtn">♪</button>' +
+    '</div>'
+  ) : '';
 
   // ── GOOGLE FONTS string ──
   var gfonts = "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@500;600&family=Cinzel:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Josefin+Sans:wght@300;400&display=swap";
@@ -1454,8 +1620,8 @@ function _doRender() {
   '<script>' +
   // Theme + YouTube config — resolved as pure JS objects at runtime
   'var THEME="' + t + '";' +
-  'var _YT_MAP={"aesthetic":"jfKfPfyJRdk","cottagecore":"HuFYqnbVbzY","darkromance":"4To1HTe_7GQ","y2k":"Dxx6YCosP9c","bali":"UfcAVejslrU","minimalist":"UiTzCQd3FGk","vintage":"EhxqpnlGrBg","celestial":"aXItOY0sLRY"};' +
-  'var YT_ID=_YT_MAP[THEME]||"jfKfPfyJRdk";' +
+  // YT_ID from user selection (state.music.ytId) or theme default
+  'var YT_ID="' + state.music.ytId + '";' +
   'var _CV_MAP={"aesthetic": ["#6a0dad", "#3d1f7a", "#9b4dca"], "cottagecore": ["#4a2800", "#8b5a00", "#c8a050"], "darkromance": ["#5a0015", "#8b001f", "#cc2244"], "y2k": ["#001a40", "#003380", "#0055cc"], "bali": ["#0a200a", "#1a4a1a", "#2d7a2d"], "minimalist": ["#c0bdb8", "#a8a5a0", "#909090"], "vintage": ["#2a1800", "#5a3800", "#8a5800"], "celestial": ["#05071a", "#0d1230", "#1a1f50"]};' +
   'var CV_COLORS=_CV_MAP[THEME]||["#222","#333","#444"];' +
   'var _CT_MAP={aesthetic:"orbs",cottagecore:"petals",darkromance:"hearts",y2k:"grid",bali:"leaves",minimalist:"lines",vintage:"orbs",celestial:"stars"};' +
@@ -1710,6 +1876,82 @@ function scrollTo_(id) {
     var el = iframe.contentWindow.document.querySelector(id);
     if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
   } catch(e) {}
+}
+
+
+// ── MUSIC PICKER FUNCTIONS ──
+function switchMusicTab(tab, btn) {
+  document.querySelectorAll('.mp-tab').forEach(function(t){ t.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('mp-preset').style.display = tab === 'preset' ? 'block' : 'none';
+  document.getElementById('mp-youtube').style.display = tab === 'youtube' ? 'block' : 'none';
+}
+
+function selectPreset(el, ytId, title) {
+  document.querySelectorAll('.preset-item').forEach(function(p){ p.classList.remove('selected'); });
+  el.classList.add('selected');
+  state.music.ytId = ytId;
+  state.music.title = title;
+  document.getElementById('npTitle').textContent = title;
+  render();
+}
+
+function extractYtId(url) {
+  if (!url) return null;
+  // Handle full URL formats
+  var patterns = [
+    /[?&]v=([a-zA-Z0-9_-]{11})/,
+    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /embed\/([a-zA-Z0-9_-]{11})/,
+    /shorts\/([a-zA-Z0-9_-]{11})/,
+    /^([a-zA-Z0-9_-]{11})$/  // bare ID
+  ];
+  for (var i = 0; i < patterns.length; i++) {
+    var m = url.match(patterns[i]);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+function previewYT(url) {
+  var id = extractYtId(url);
+  var preview = document.getElementById('ytPreview');
+  var error   = document.getElementById('ytError');
+  if (!id) {
+    if (url.length > 5) {
+      preview.style.display = 'none';
+      error.style.display = 'block';
+    } else {
+      preview.style.display = 'none';
+      error.style.display = 'none';
+    }
+    return;
+  }
+  error.style.display = 'none';
+  document.getElementById('ytThumb').src = 'https://img.youtube.com/vi/' + id + '/mqdefault.jpg';
+  document.getElementById('ytTitle').textContent = 'Video ID: ' + id;
+  document.getElementById('ytIdDisplay').textContent = 'youtube.com/watch?v=' + id;
+  preview.style.display = 'block';
+  // Store pending id
+  preview.dataset.pendingId = id;
+  preview.dataset.pendingTitle = 'Lagu pilihan kalian';
+}
+
+function useYouTubeUrl() {
+  var preview = document.getElementById('ytPreview');
+  var id = preview.dataset.pendingId;
+  var url = document.getElementById('ytUrlInput').value;
+  if (!id) return;
+  var title = 'Lagu pilihan kalian — YouTube';
+  state.music.ytId = id;
+  state.music.title = title;
+  document.getElementById('npTitle').textContent = title;
+  // Deselect presets
+  document.querySelectorAll('.preset-item').forEach(function(p){ p.classList.remove('selected'); });
+  // Visual feedback
+  var btn = document.querySelector('.yt-use-btn');
+  if (btn) { btn.textContent = '✓ Tersimpan!'; setTimeout(function(){ btn.textContent = '✓ Gunakan Lagu Ini'; }, 2000); }
+  render();
 }
 
 // ── INIT ──
