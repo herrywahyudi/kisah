@@ -825,9 +825,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
         </div>
         <div class="toggle-row">
           <span class="toggle-label">🎵 Musik Latar</span>
-          <div class="toggle" id="tog-music" onclick="togFeature('music',this)"></div>
+          <div class="toggle on" id="tog-music" onclick="togFeature('music',this)"></div>
         </div>
-        <div id="music-picker" style="display:none">
+        <div id="music-picker" style="display:block">
           <div class="music-picker-box">
             <div class="mp-tabs">
               <button class="mp-tab active" onclick="switchMusicTab('preset',this)">Pilihan Kami</button>
@@ -1029,7 +1029,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
 // ── STATE ──
 var state = {
   theme: 'aesthetic',
-  features: { countdown:true, gallery:true, rsvp:true, wishes:true, music:false, maps:true },
+  features: { countdown:true, gallery:true, rsvp:true, wishes:true, music:true, maps:true },
   step: 1,
   photos: { groomPhoto: null, bridePhoto: null },
   _cdInterval: null,
@@ -1708,7 +1708,7 @@ function _doRender() {
     'window.onYouTubeIframeAPIReady=function(){' +
       'ytFrame=new YT.Player("yt-player",{' +
         'videoId:YT_ID,' +
-        'playerVars:{autoplay:1,loop:1,playlist:YT_ID,controls:0,mute:0,start:30},' +
+        'playerVars:{autoplay:1,loop:1,playlist:YT_ID,controls:0,mute:0,start:30,origin:window.location.href.split("/").slice(0,3).join("/")||"https://herrywahyudi.github.io"},' +
         'events:{' +
           'onReady:function(e){' +
             'e.target.setVolume(55);' +
@@ -1795,27 +1795,35 @@ function _doRender() {
 
   '</body></html>';
 
-  // ── INJECT into iframe ──
+  // ── INJECT into iframe via Blob URL (avoids srcdoc null-origin CORS issue) ──
   var iframe = document.getElementById('screen');
 
-  // smooth theme transition: fade out → swap → fade in
-  if (themeChanged) {
-    iframe.style.opacity = '0';
-    iframe.style.transition = 'opacity 0.3s ease';
-    setTimeout(function() {
-      iframe.srcdoc = doc;
-      iframe.style.opacity = '1';
-    }, 280);
-  } else {
-    // preserve scroll position on content updates
-    var prevScroll = 0;
-    try { prevScroll = iframe.contentWindow.scrollY || 0; } catch(e){}
-    iframe.srcdoc = doc;
-    // restore scroll after load
+  function injectDoc(htmlStr, scrollY) {
+    // Revoke previous blob URL to avoid memory leak
+    if (iframe._blobUrl) { try { URL.revokeObjectURL(iframe._blobUrl); } catch(e){} }
+    var blob = new Blob([htmlStr], {type: 'text/html'});
+    var url = URL.createObjectURL(blob);
+    iframe._blobUrl = url;
     iframe.onload = function() {
-      try { iframe.contentWindow.scrollTo(0, prevScroll); } catch(e){}
+      if (scrollY) { try { iframe.contentWindow.scrollTo(0, scrollY); } catch(e){} }
       iframe.onload = null;
     };
+    iframe.src = url;
+    // Also keep srcdoc in sync for download
+    iframe._lastDoc = htmlStr;
+  }
+
+  if (themeChanged) {
+    iframe.style.opacity = '0';
+    iframe.style.transition = 'opacity 0.35s ease';
+    setTimeout(function() {
+      injectDoc(doc, 0);
+      iframe.style.opacity = '1';
+    }, 300);
+  } else {
+    var prevScroll = 0;
+    try { prevScroll = iframe.contentWindow.scrollY || 0; } catch(e){}
+    injectDoc(doc, prevScroll);
   }
 }
 
@@ -1837,7 +1845,7 @@ function updateSummary() {
 // ── DOWNLOAD ──
 function downloadHTML() {
   var iframe = document.getElementById('screen');
-  var html = iframe.srcdoc || '';
+  var html = iframe._lastDoc || iframe.srcdoc || '';
   var groom = v('groomName','pasangan');
   var bride = v('brideName','bahagia');
   var blob = new Blob([html], {type:'text/html'});
@@ -1850,10 +1858,15 @@ function downloadHTML() {
 function toggleFullPreview() {
   // "Lihat seperti tamu" — open guest mode overlay
   var iframe = document.getElementById('screen');
-  var src = iframe.srcdoc || '';
+  var src = iframe._lastDoc || iframe.srcdoc || '';
   if (!src) { render(); setTimeout(toggleFullPreview, 200); return; }
   var gf = document.getElementById('guestIframe');
-  gf.srcdoc = src;
+  // Use blob URL for guest iframe too (same CORS fix)
+  var blob = new Blob([src], {type:'text/html'});
+  var url = URL.createObjectURL(blob);
+  if (gf._blobUrl) { try { URL.revokeObjectURL(gf._blobUrl); } catch(e){} }
+  gf._blobUrl = url;
+  gf.src = url;
   var overlay = document.getElementById('guestOverlay');
   overlay.classList.add('active');
   document.body.style.overflow = 'hidden';
@@ -1955,6 +1968,11 @@ function useYouTubeUrl() {
 }
 
 // ── INIT ──
+// Show music picker if music is already on
+(function(){
+  var picker = document.getElementById('music-picker');
+  if (picker && state.features.music) picker.style.display = 'block';
+})();
 render();
 
 </script>
