@@ -824,7 +824,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
           <div class="toggle on" id="tog-wishes" onclick="togFeature('wishes',this)"></div>
         </div>
         <div class="toggle-row">
-          <span class="toggle-label">🎵 Musik Latar</span>
+          <span class="toggle-label">🎵 Musik Latar<br><span id="musicNowLabel" style="font-size:10px;font-style:italic;color:var(--muted);font-weight:300">Lofi Study — Dreamy Beats</span></span>
           <div class="toggle on" id="tog-music" onclick="togFeature('music',this)"></div>
         </div>
         <div id="music-picker" style="display:block">
@@ -987,7 +987,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
     <div class="preview-scroll">
       <div class="device" id="device">
         <div class="device-notch"></div>
-        <iframe id="screen" style="width:100%;height:820px;border:none;display:block;padding-top:22px;" scrolling="yes"></iframe>
+        <iframe id="screen" allow="autoplay; encrypted-media" style="width:100%;height:820px;border:none;display:block;padding-top:22px;" scrolling="yes"></iframe>
       </div>
     </div>
   </div>
@@ -1021,7 +1021,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
 
 <!-- GUEST MODE OVERLAY -->
 <div class="guest-mode-overlay" id="guestOverlay">
-  <iframe class="guest-iframe" id="guestIframe"></iframe>
+  <iframe class="guest-iframe" id="guestIframe" allow="autoplay; encrypted-media"></iframe>
   <button class="guest-close" onclick="closeGuestMode()">✕ Kembali ke Editor</button>
 </div>
 
@@ -1324,10 +1324,16 @@ function _doRender() {
   // ── MUSIC BAR ──
   var musicHtml = state.features.music ? (
     '<div class="music-player" id="musicPlayer">' +
-    '<button class="mp-play" id="mpPlayBtn" onclick="toggleMusic()"><span id="mpIcon">▶</span></button>' +
-    '<div class="mp-bars" id="mpBars"><span></span><span></span><span></span><span></span></div>' +
-    '<span class="mp-title" id="mpTitle">' + (state.music.title || 'Wedding Ambient') + '</span>' +
-    '<button class="mp-play" onclick="toggleMusic()" style="font-size:9px;letter-spacing:1px;width:auto;padding:0 8px;border-radius:2px;opacity:0.6" id="mpMuteBtn">♪</button>' +
+      '<button class="mp-play" id="mpPlayBtn" onclick="toggleMusic()">' +
+        '<span id="mpIcon">⏸</span>' +
+      '</button>' +
+      '<div class="mp-bars playing" id="mpBars">' +
+        '<span></span><span></span><span></span><span></span>' +
+      '</div>' +
+      '<div class="mp-info">' +
+        '<span class="mp-label">Musik</span>' +
+        '<span class="mp-title" id="mpTitle">' + (state.music.title || 'Wedding Ambient') + '</span>' +
+      '</div>' +
     '</div>'
   ) : '';
 
@@ -1421,17 +1427,19 @@ function _doRender() {
   '.os-bars-mini.playing span:nth-child(3){animation:barA 1.1s .3s ease-in-out infinite;}' +
 
   // music player in invitation
-  '.music-player{position:fixed;bottom:0;left:0;right:0;padding:10px 16px;background:'+th.bg+'f2;backdrop-filter:blur(16px);border-top:1px solid '+th.accentBorder+';display:flex;align-items:center;gap:10px;z-index:100;}' +
-  '.mp-play{width:30px;height:30px;border-radius:50%;border:1px solid '+th.accentBorder+';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .3s;background:none;color:'+th.accent+';font-size:10px;}' +
-  '.mp-play:hover{background:'+th.accentDim+';}' +
-  '.mp-bars{display:flex;gap:2px;align-items:flex-end;height:16px;flex-shrink:0;}' +
-  '.mp-bars span{width:3px;border-radius:2px;background:'+th.accent+';opacity:.7;}' +
-  '.mp-bars.playing span:nth-child(1){animation:barA 1.0s .00s ease-in-out infinite;}' +
-  '.mp-bars.playing span:nth-child(2){animation:barA 1.0s .15s ease-in-out infinite;}' +
-  '.mp-bars.playing span:nth-child(3){animation:barA 1.0s .30s ease-in-out infinite;}' +
-  '.mp-bars.playing span:nth-child(4){animation:barA 1.0s .45s ease-in-out infinite;}' +
-  '.mp-bars span:nth-child(1){height:5px;} .mp-bars span:nth-child(2){height:12px;} .mp-bars span:nth-child(3){height:8px;} .mp-bars span:nth-child(4){height:10px;}' +
-  '.mp-title{flex:1;font-size:10px;opacity:.4;font-style:italic;}' +
+  '.music-player{position:fixed;bottom:0;left:0;right:0;padding:10px 20px;background:'+th.bg+'ee;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid '+th.accentBorder+';display:flex;align-items:center;gap:12px;z-index:200;}' +
+  '.mp-play{width:32px;height:32px;border-radius:50%;border:1px solid '+th.accent+';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .25s;background:transparent;color:'+th.accent+';font-size:12px;outline:none;}' +
+  '.mp-play:hover{background:'+th.accentDim+';transform:scale(1.1);}' +
+  '.mp-bars{display:flex;gap:2px;align-items:flex-end;height:18px;flex-shrink:0;}' +
+  '.mp-bars span{width:3px;border-radius:2px;background:'+th.accent+';opacity:.7;transition:height .1s;}' +
+  '.mp-bars span:nth-child(1){height:5px;}.mp-bars span:nth-child(2){height:13px;}.mp-bars span:nth-child(3){height:8px;}.mp-bars span:nth-child(4){height:11px;}' +
+  '.mp-bars.playing span:nth-child(1){animation:barA 1.0s 0s ease-in-out infinite;}' +
+  '.mp-bars.playing span:nth-child(2){animation:barA 1.0s .18s ease-in-out infinite;}' +
+  '.mp-bars.playing span:nth-child(3){animation:barA 1.0s .35s ease-in-out infinite;}' +
+  '.mp-bars.playing span:nth-child(4){animation:barA 1.0s .52s ease-in-out infinite;}' +
+  '.mp-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}' +
+  '.mp-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:'+th.accent+';opacity:.5;font-family:sans-serif;}' +
+  '.mp-title{font-size:11px;color:'+th.text+';opacity:.55;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}' +
 
   '@keyframes barA{0%,100%{transform:scaleY(1);}50%{transform:scaleY(0.3);}}' +
   '@keyframes burstFly{0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg);}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0.3) rotate(180deg);}}' +
@@ -1699,7 +1707,7 @@ function _doRender() {
       'if(ytIframe)return;' +
       'ytIframe=document.createElement("iframe");' +
       'ytIframe.id="yt-embed";' +
-      'ytIframe.allow="autoplay";' +
+      'ytIframe.allow="autoplay; encrypted-media";' +
       'ytIframe.style.cssText="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;border:none;";' +
       'ytIframe.src=buildSrc(YT_ID);' +
       'document.body.appendChild(ytIframe);' +
@@ -1718,14 +1726,17 @@ function _doRender() {
     '}' +
 
     'function updateUI(){' +
+      // Opening screen EQ bars
       'var bars=document.getElementById("osBars");' +
       'if(bars)bars.className="os-bars-mini"+(playing?" playing":"");' +
+      // Floating music bar
       'var mpBars=document.getElementById("mpBars");' +
       'if(mpBars)mpBars.className="mp-bars"+(playing?" playing":"");' +
-      'var lbl=document.getElementById("osMusicLabel");' +
-      'if(lbl)lbl.textContent=playing?"♪":"♪";' +
       'var mpIcon=document.getElementById("mpIcon");' +
       'if(mpIcon)mpIcon.textContent=playing?"⏸":"▶";' +
+      // Show/hide the music player bar itself
+      'var mp=document.getElementById("musicPlayer");' +
+      'if(mp)mp.style.opacity=playing?"1":"0.5";' +
     '}' +
 
     'window.toggleAmbient=function(e){' +
@@ -1737,10 +1748,7 @@ function _doRender() {
       'if(playing){destroyPlayer();}else{createPlayer();}' +
     '};' +
 
-    // Start music automatically on first tap (opening screen)
-    'document.addEventListener("click",function(){' +
-      'if(!ytIframe)createPlayer();' +
-    '},{once:true});' +
+    // Music starts via openInvitation() on Buka Undangan tap
 
   '})();' +
 
@@ -1761,6 +1769,8 @@ function _doRender() {
     's.classList.add("opened");' +
     'document.body.classList.add("unlocked");' +
     'setTimeout(function(){s.style.display="none";},1000);' +
+    // Start music on this user gesture — must be synchronous
+    'createPlayer();' +
   '}' +
   // ── SCROLL REVEAL ──
   '(function(){' +
@@ -1898,7 +1908,10 @@ function selectPreset(el, ytId, title) {
   el.classList.add('selected');
   state.music.ytId = ytId;
   state.music.title = title;
-  document.getElementById('npTitle').textContent = title;
+  var np = document.getElementById('npTitle');
+  if (np) np.textContent = title;
+  var nl = document.getElementById('musicNowLabel');
+  if (nl) nl.textContent = title;
   render();
 }
 
@@ -1935,12 +1948,20 @@ function previewYT(url) {
   }
   error.style.display = 'none';
   document.getElementById('ytThumb').src = 'https://img.youtube.com/vi/' + id + '/mqdefault.jpg';
-  document.getElementById('ytTitle').textContent = 'Video ID: ' + id;
-  document.getElementById('ytIdDisplay').textContent = 'youtube.com/watch?v=' + id;
+  document.getElementById('ytTitle').textContent = 'youtube.com/watch?v=' + id;
+  document.getElementById('ytIdDisplay').textContent = 'Tap "Gunakan" untuk memakai lagu ini';
   preview.style.display = 'block';
-  // Store pending id
   preview.dataset.pendingId = id;
   preview.dataset.pendingTitle = 'Lagu pilihan kalian';
+  // Try to fetch video title via oEmbed (no API key needed)
+  fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' + id + '&format=json')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d.title) {
+        document.getElementById('ytTitle').textContent = d.title;
+        preview.dataset.pendingTitle = d.title;
+      }
+    }).catch(function(){});
 }
 
 function useYouTubeUrl() {
@@ -1951,7 +1972,10 @@ function useYouTubeUrl() {
   var title = 'Lagu pilihan kalian — YouTube';
   state.music.ytId = id;
   state.music.title = title;
-  document.getElementById('npTitle').textContent = title;
+  var np = document.getElementById('npTitle');
+  if (np) np.textContent = title;
+  var nl = document.getElementById('musicNowLabel');
+  if (nl) nl.textContent = title;
   // Deselect presets
   document.querySelectorAll('.preset-item').forEach(function(p){ p.classList.remove('selected'); });
   // Visual feedback
