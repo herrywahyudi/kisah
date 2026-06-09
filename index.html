@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kisah — Undangan Digital yang Terasa seperti Hadiah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:#08070a;
+  --surface:#0e0c12;
+  --card:#13111a;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.1);
+  --rose:#e8a0b0;
+  --rose-dim:rgba(232,160,176,0.1);
+  --rose-mid:rgba(232,160,176,0.3);
+  --gold:#c9a96e;
+  --gold-dim:rgba(201,169,110,0.1);
+  --text:#f2ede8;
+  --muted:#6a5f6a;
+  --sub:#a89898;
+  --serif:'Instrument Serif',serif;
+  --sans:'DM Sans',sans-serif;
+  --display:'Syne',sans-serif;
+}
+
+html{scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none;}
+
+/* ── CURSOR ── */
+.cur{width:6px;height:6px;background:var(--rose);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .3s,height .3s;mix-blend-mode:screen;}
+.cur-ring{width:28px;height:28px;border:1px solid rgba(232,160,176,0.4);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .1s ease,top .1s ease,width .3s,height .3s;}
+body:hover .cur{opacity:1;}
+
+/* ── ANIMATED MESH BG ── */
+.mesh-bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.mesh-bg::before{
+  content:'';position:absolute;
+  width:900px;height:900px;
+  background:radial-gradient(ellipse,rgba(120,60,100,0.12) 0%,transparent 65%);
+  top:-200px;left:-200px;
+  animation:meshFloat1 18s ease-in-out infinite;
+}
+.mesh-bg::after{
+  content:'';position:absolute;
+  width:700px;height:700px;
+  background:radial-gradient(ellipse,rgba(80,60,140,0.1) 0%,transparent 65%);
+  bottom:-100px;right:-100px;
+  animation:meshFloat2 22s ease-in-out infinite;
+}
+.mesh-mid{
+  position:absolute;
+  width:600px;height:600px;
+  background:radial-gradient(ellipse,rgba(160,100,80,0.07) 0%,transparent 65%);
+  top:40%;left:40%;transform:translate(-50%,-50%);
+  animation:meshFloat3 15s ease-in-out infinite;
+}
+@keyframes meshFloat1{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(60px,40px) scale(1.1);}}
+@keyframes meshFloat2{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-40px,-60px) scale(1.08);}}
+@keyframes meshFloat3{0%,100%{transform:translate(-50%,-50%) scale(1);}50%{transform:translate(-50%,-50%) scale(1.15);}}
+
+/* noise */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.025;pointer-events:none;z-index:1;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 52px;display:flex;align-items:center;justify-content:space-between;transition:all .4s;}
+nav.scrolled{background:rgba(8,7,10,.92);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);padding:14px 52px;}
+
+.logo{font-family:var(--serif);font-size:26px;font-style:italic;color:var(--text);letter-spacing:-.5px;}
+.logo em{font-style:normal;color:var(--rose);font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:3px;vertical-align:super;margin-left:2px;text-transform:uppercase;}
+
+.nav-links{display:flex;gap:36px;list-style:none;}
+.nav-links a{font-size:13px;color:var(--muted);text-decoration:none;transition:color .2s;}
+.nav-links a:hover{color:var(--text);}
+
+.nav-cta{background:var(--rose);color:#0a0709;border:none;padding:10px 24px;font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:none;border-radius:2px;text-decoration:none;transition:all .3s;}
+.nav-cta:hover{background:#f0b8c8;transform:translateY(-1px);}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 24px 80px;position:relative;z-index:2;}
+
+.hero-kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--display);font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;
+  color:var(--rose);margin-bottom:28px;
+  padding:8px 20px;border:1px solid var(--rose-mid);border-radius:40px;
+  background:var(--rose-dim);
+  animation:fadeUp .8s ease both;
+}
+.hero-kicker::before,.hero-kicker::after{content:'—';opacity:.4;}
+
+.hero-h1{
+  font-family:var(--serif);
+  font-size:clamp(52px,8.5vw,104px);
+  font-weight:400;line-height:1.0;
+  color:var(--text);margin-bottom:0;
+  animation:fadeUp .8s .1s ease both;
+}
+.hero-h1 em{font-style:italic;color:var(--rose);}
+.hero-h1 .line2{
+  display:block;
+  font-size:clamp(44px,7vw,88px);
+  color:rgba(242,237,232,0.35);
+  margin-top:4px;
+}
+
+.hero-sub{
+  font-family:var(--sans);font-size:17px;font-weight:300;
+  color:var(--muted);max-width:460px;line-height:1.9;
+  margin:28px auto 44px;
+  animation:fadeUp .8s .2s ease both;
+  font-style:italic;
+}
+
+.hero-actions{display:flex;gap:12px;align-items:center;justify-content:center;animation:fadeUp .8s .3s ease both;}
+
+.btn-rose{
+  background:var(--rose);color:#0a0709;border:none;
+  padding:15px 36px;font-family:var(--display);font-size:11px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;cursor:none;border-radius:2px;
+  text-decoration:none;transition:all .3s;
+  display:inline-flex;align-items:center;gap:10px;
+}
+.btn-rose:hover{background:#f0b8c8;transform:translateY(-2px);box-shadow:0 16px 40px rgba(232,160,176,0.25);}
+
+.btn-ghost{
+  background:transparent;color:var(--sub);border:1px solid var(--border2);
+  padding:14px 28px;font-family:var(--sans);font-size:13px;
+  cursor:none;border-radius:2px;text-decoration:none;transition:all .3s;
+}
+.btn-ghost:hover{border-color:var(--rose-mid);color:var(--text);}
+
+/* ── INVITATION FLOATER ── */
+.hero-preview{
+  margin-top:72px;position:relative;
+  animation:fadeUp .8s .5s ease both;
+}
+
+.preview-glow{
+  position:absolute;inset:-40px;
+  background:radial-gradient(ellipse at 50% 50%,rgba(232,160,176,0.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+.phones-wrap{
+  display:flex;gap:20px;align-items:flex-end;justify-content:center;
+}
+
+.phone{
+  width:180px;border-radius:24px;
+  border:6px solid #1e1a24;
+  box-shadow:0 32px 80px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.04);
+  overflow:hidden;flex-shrink:0;
+}
+.phone.main{width:220px;border-radius:28px;transform:translateY(-20px);box-shadow:0 48px 100px rgba(0,0,0,.8),0 0 0 1px rgba(232,160,176,.08),inset 0 0 0 1px rgba(255,255,255,.04);}
+.phone.side{opacity:.55;filter:blur(.5px);}
+
+.phone-screen{width:100%;aspect-ratio:9/16;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 14px;position:relative;overflow:hidden;}
+
+/* phone screen themes */
+.ps-rose{background:linear-gradient(160deg,#2e0d1c,#0f0810);}
+.ps-green{background:linear-gradient(160deg,#102010,#091408);}
+.ps-purple{background:linear-gradient(160deg,#2d1f40,#110d1a);}
+
+.ps-label{font-size:5px;letter-spacing:2px;text-transform:uppercase;opacity:.5;margin-bottom:8px;font-family:sans-serif;}
+.ps-name{font-family:'Georgia',serif;font-size:16px;font-weight:300;line-height:1.2;margin-bottom:4px;}
+.ps-amp{font-size:12px;font-style:italic;opacity:.5;margin:2px 0;}
+.ps-date{font-size:5px;letter-spacing:1.5px;text-transform:uppercase;opacity:.4;margin-top:8px;font-family:sans-serif;padding:4px 10px;border:1px solid currentColor;border-color:rgba(255,255,255,.2);}
+.ps-line{width:40px;height:.5px;background:currentColor;opacity:.2;margin:8px auto;}
+
+/* ps-rose colors */
+.ps-rose .ps-name{color:#fce8ee;}
+.ps-rose .ps-amp{color:#e06080;}
+/* ps-green colors */
+.ps-green .ps-name{color:#e8f8e0;}
+.ps-green .ps-amp{color:#70c068;}
+/* ps-purple colors */
+.ps-purple .ps-name{color:#f0e4ff;}
+.ps-purple .ps-amp{color:#b47eff;}
+
+.hero-caption{
+  margin-top:24px;font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);text-align:center;
+}
+
+/* ── SOCIAL PROOF STRIP ── */
+.proof-strip{
+  position:relative;z-index:2;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:20px 52px;
+  display:flex;align-items:center;justify-content:center;gap:56px;
+}
+.proof-item{text-align:center;}
+.proof-num{font-family:var(--serif);font-size:28px;font-style:italic;color:var(--text);display:block;}
+.proof-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+
+.proof-divider{width:1px;height:40px;background:var(--border);}
+
+/* ── SECTION BASE ── */
+.section{padding:100px 52px;position:relative;z-index:2;max-width:1320px;margin:0 auto;}
+.eyebrow{font-family:var(--display);font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--rose);margin-bottom:16px;}
+.section-title{font-family:var(--serif);font-size:clamp(34px,4vw,56px);font-weight:400;line-height:1.08;color:var(--text);margin-bottom:16px;}
+.section-title em{font-style:italic;color:rgba(242,237,232,.35);}
+.section-sub{font-size:15px;font-weight:300;color:var(--muted);max-width:480px;line-height:1.85;font-style:italic;}
+
+/* ── THEME SHOWCASE ── */
+.themes-outer{position:relative;z-index:2;padding:80px 0;border-top:1px solid var(--border);overflow:hidden;}
+.themes-header{padding:0 52px;margin-bottom:52px;}
+
+/* marquee */
+.marquee{overflow:hidden;padding:8px 0;}
+.marquee-inner{display:flex;gap:16px;width:max-content;animation:marqueeScroll 40s linear infinite;}
+.marquee-inner:hover{animation-play-state:paused;}
+@keyframes marqueeScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+.theme-showcase-card{
+  flex-shrink:0;width:220px;border-radius:16px;overflow:hidden;
+  border:1px solid var(--border);cursor:none;transition:all .4s;
+  position:relative;
+}
+.theme-showcase-card:hover{transform:translateY(-6px) scale(1.02);border-color:var(--rose-mid);box-shadow:0 24px 60px rgba(0,0,0,.5);}
+
+.tsc-screen{height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px;position:relative;overflow:hidden;}
+
+.tsc-pretitle{font-size:5.5px;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;opacity:.55;font-family:sans-serif;}
+.tsc-names{font-family:'Georgia',serif;font-weight:300;font-size:20px;line-height:1.15;margin-bottom:5px;}
+.tsc-amp{font-size:15px;font-style:italic;opacity:.55;margin:3px 0;}
+.tsc-line{width:48px;height:.5px;background:currentColor;opacity:.2;margin:10px auto;}
+.tsc-date{font-size:5px;letter-spacing:2px;text-transform:uppercase;opacity:.45;font-family:sans-serif;padding:4px 12px;border:1px solid currentColor;border-color:rgba(255,255,255,.15);}
+.tsc-orn{font-size:8px;letter-spacing:5px;margin-top:12px;opacity:.25;}
+
+.tsc-label{
+  padding:12px 14px;background:rgba(0,0,0,.3);backdrop-filter:blur(8px);
+  border-top:1px solid var(--border);
+}
+.tsc-theme-name{font-family:var(--display);font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.tsc-theme-mood{font-size:10px;font-style:italic;color:var(--sub);}
+
+/* theme screen backgrounds */
+.ts-mimpi{background:radial-gradient(ellipse at 50% 0%,#2d1f40,#110d1a);color:#e8d4f8;}
+.ts-taman{background:linear-gradient(160deg,#2a2010,#1a160c);color:#e8d8b0;}
+.ts-malam{background:radial-gradient(ellipse at 50% 0%,#2e0d1c,#0f0810);color:#f0d0da;}
+.ts-cahaya{background:linear-gradient(160deg,#0a1428,#08101e);color:#c0e0ff;}
+.ts-surga{background:linear-gradient(160deg,#102010,#091408);color:#d0eec8;}
+.ts-bisikan{background:linear-gradient(160deg,#f0efe9,#f7f6f2);color:#2a2820;}
+.ts-warisan{background:linear-gradient(160deg,#241408,#160e08);color:#e8d0a0;}
+.ts-langit{background:radial-gradient(ellipse at 50% 0%,#12183a,#070918);color:#c8d0f0;}
+
+/* ── FEATURES ── */
+.features-bento{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:auto auto;
+  gap:2px;
+  margin-top:60px;
+}
+.bento-card{
+  background:var(--card);padding:36px 32px;
+  border:1px solid var(--border);position:relative;overflow:hidden;
+  transition:background .3s;
+}
+.bento-card:hover{background:#181420;}
+.bento-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--rose),transparent);opacity:0;transition:opacity .4s;}
+.bento-card:hover::after{opacity:.6;}
+.bento-card.wide{grid-column:span 2;}
+.bento-card.tall{grid-row:span 2;}
+.bento-icon{font-size:26px;margin-bottom:20px;display:block;}
+.bento-title{font-family:var(--serif);font-size:20px;color:var(--text);margin-bottom:10px;}
+.bento-desc{font-size:13px;color:var(--muted);line-height:1.85;font-style:italic;}
+
+/* ── HOW IT WORKS ── */
+.how-section{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);margin-top:56px;position:relative;}
+.steps::before{content:'';position:absolute;top:28px;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,var(--border),var(--border),transparent);}
+.step{text-align:center;padding:0 24px;}
+.step-circle{
+  width:56px;height:56px;border-radius:50%;border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+  font-family:var(--serif);font-size:22px;font-style:italic;color:var(--rose);
+  background:var(--bg);position:relative;z-index:1;transition:all .4s;
+}
+.step:hover .step-circle{background:var(--rose);color:#0a0709;border-color:var(--rose);transform:scale(1.1);}
+.step-title{font-family:var(--display);font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.8;font-style:italic;}
+
+/* ── EMOTIONAL PULL SECTION ── */
+.emotion-section{
+  padding:100px 52px;position:relative;z-index:2;
+  text-align:center;overflow:hidden;
+}
+.emotion-quote{
+  font-family:var(--serif);font-size:clamp(28px,4vw,52px);font-style:italic;
+  color:var(--text);line-height:1.3;max-width:800px;margin:0 auto 16px;
+  opacity:0;animation:quoteReveal 1s .3s ease both;
+}
+.emotion-source{font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+@keyframes quoteReveal{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── PRICING ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:60px;}
+.price-card{
+  background:var(--card);border:1px solid var(--border);border-radius:4px;
+  padding:40px 32px;position:relative;transition:transform .3s,border-color .3s;
+}
+.price-card:hover{transform:translateY(-4px);}
+.price-card.feat{border-color:var(--rose-mid);background:#160d14;}
+.price-plan{font-family:var(--display);font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+.price-amount{font-family:var(--serif);font-size:52px;font-style:italic;color:var(--text);line-height:1;margin-bottom:4px;}
+.price-period{font-size:12px;color:var(--muted);margin-bottom:24px;}
+.price-div{height:1px;background:var(--border);margin:20px 0;}
+.price-features{list-style:none;margin-bottom:32px;}
+.price-features li{font-size:13px;color:var(--sub);padding:7px 0;display:flex;align-items:center;gap:10px;font-style:italic;}
+.price-features li::before{content:'✓';color:var(--rose);font-size:11px;flex-shrink:0;font-style:normal;}
+.price-features li.dim::before{content:'—';color:var(--muted);}
+.price-features li.dim{color:var(--muted);}
+.price-btn{
+  width:100%;padding:13px;background:transparent;color:var(--text);
+  border:1px solid var(--border2);font-family:var(--display);font-size:11px;
+  font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:none;
+  border-radius:2px;transition:all .3s;text-decoration:none;display:block;text-align:center;
+}
+.price-btn:hover{border-color:var(--rose-mid);background:var(--rose-dim);}
+.price-card.feat .price-btn{background:var(--rose);color:#0a0709;border-color:var(--rose);}
+.price-card.feat .price-btn:hover{background:#f0b8c8;}
+
+/* ── TESTIMONIALS ── */
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:60px;}
+.testi-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:32px 28px;}
+.testi-stars{color:var(--rose);font-size:12px;margin-bottom:16px;letter-spacing:3px;}
+.testi-text{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--sub);line-height:1.85;margin-bottom:20px;}
+.testi-author{display:flex;align-items:center;gap:12px;}
+.testi-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;font-family:var(--serif);font-style:italic;}
+.testi-name{font-size:13px;font-weight:500;color:var(--text);}
+.testi-loc{font-size:11px;color:var(--muted);font-style:italic;}
+
+/* ── FAQ ── */
+.faq-list{margin-top:48px;max-width:680px;}
+.faq-item{border-bottom:1px solid var(--border);padding:20px 0;cursor:none;}
+.faq-q{display:flex;align-items:center;justify-content:space-between;font-size:15px;color:var(--text);gap:16px;font-family:var(--serif);}
+.faq-icon{width:24px;height:24px;border:1px solid var(--border2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--rose);flex-shrink:0;transition:all .3s;}
+.faq-item.open .faq-icon{transform:rotate(45deg);background:var(--rose-dim);}
+.faq-a{font-size:13px;color:var(--muted);line-height:1.85;max-height:0;overflow:hidden;transition:max-height .4s,padding .3s;font-style:italic;}
+.faq-item.open .faq-a{max-height:200px;padding-top:12px;}
+
+/* ── CTA BAND ── */
+.cta-band{
+  padding:120px 52px;text-align:center;position:relative;z-index:2;
+  border-top:1px solid var(--border);overflow:hidden;
+}
+.cta-band::before{
+  content:'';position:absolute;width:800px;height:400px;
+  background:radial-gradient(ellipse,rgba(232,160,176,0.06) 0%,transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;
+}
+.cta-title{font-family:var(--serif);font-size:clamp(36px,5.5vw,72px);font-style:italic;color:var(--text);margin-bottom:16px;line-height:1.05;}
+.cta-sub{font-size:15px;color:var(--muted);margin-bottom:40px;font-style:italic;font-weight:300;}
+
+/* ── FOOTER ── */
+footer{padding:48px 52px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2;}
+.footer-logo{font-family:var(--serif);font-size:22px;font-style:italic;color:var(--text);}
+.footer-links{display:flex;gap:28px;list-style:none;}
+.footer-links a{font-size:12px;color:var(--muted);text-decoration:none;transition:color .2s;}
+.footer-links a:hover{color:var(--text);}
+.footer-copy{font-size:11px;color:var(--muted);font-style:italic;}
+
+/* ── REVEAL ── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  nav{padding:16px 20px;}nav.scrolled{padding:12px 20px;}
+  .nav-links{display:none;}
+  .hero{padding:100px 20px 60px;}
+  .phones-wrap{gap:10px;}
+  .phone.side{display:none;}
+  .proof-strip{padding:20px;gap:24px;flex-wrap:wrap;}
+  .section{padding:60px 20px;}
+  .features-bento{grid-template-columns:1fr;}
+  .bento-card.wide{grid-column:auto;}
+  .pricing-grid,.testi-grid{grid-template-columns:1fr;}
+  .steps{grid-template-columns:1fr 1fr;gap:32px;}
+  .steps::before{display:none;}
+  footer{flex-direction:column;gap:20px;text-align:center;}
+  .themes-header{padding:0 20px;}
+  .emotion-section{padding:60px 20px;}
+  .cta-band{padding:80px 20px;}
+}
+</style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-ring" id="curRing"></div>
+<div class="mesh-bg"><div class="mesh-mid"></div></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="logo">Kisah<em>™</em></div>
+  <ul class="nav-links">
+    <li><a href="#themes">Tema</a></li>
+    <li><a href="#features">Fitur</a></li>
+    <li><a href="#pricing">Harga</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+  <a href="builder.html" class="nav-cta">Mulai Kisah Kalian</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-kicker">Undangan Digital Pernikahan</div>
+  <h1 class="hero-h1">
+    Undangan yang terasa<br>
+    seperti <em>hadiah.</em>
+    <span class="line2">Bukan sekadar link.</span>
+  </h1>
+  <p class="hero-sub">Kisah kalian, disampaikan dengan indah. Bukan sekadar undangan — sebuah pengalaman yang membuat tamu berdecak kagum sebelum membaca satu kata pun.</p>
+  <div class="hero-actions">
+    <a href="builder.html" class="btn-rose">Mulai Gratis <span>→</span></a>
+    <a href="#themes" class="btn-ghost">Lihat Tema</a>
+  </div>
+
+  <div class="hero-preview">
+    <div class="preview-glow"></div>
+    <div class="phones-wrap">
+      <div class="phone side">
+        <div class="phone-screen ps-green">
+          <div class="ps-label">The Wedding of</div>
+          <div class="ps-name" style="color:#e8f8e0">Dewa<br><span class="ps-amp" style="color:#70c068">&</span><br>Ayu</div>
+          <div class="ps-line"></div>
+          <div class="ps-date" style="color:#d0eec8">20 · 06 · 2026</div>
+        </div>
+      </div>
+      <div class="phone main">
+        <div class="phone-screen ps-rose">
+          <div class="ps-label">The Wedding of</div>
+          <div class="ps-name">Adrian<br><span class="ps-amp">&</span><br>Celine</div>
+          <div class="ps-line"></div>
+          <div class="ps-date">Sabtu, 20 Juni 2026</div>
+        </div>
+      </div>
+      <div class="phone side">
+        <div class="phone-screen ps-purple">
+          <div class="ps-label">The Wedding of</div>
+          <div class="ps-name" style="color:#f0e4ff">Rizky<br><span class="ps-amp" style="color:#b47eff">&</span><br>Aulia</div>
+          <div class="ps-line"></div>
+          <div class="ps-date" style="color:#e8d4f8">14 · 02 · 2026</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-caption">Dipercaya oleh 2.847 pasangan di seluruh Indonesia</div>
+  </div>
+</section>
+
+<!-- PROOF STRIP -->
+<div class="proof-strip">
+  <div class="proof-item"><span class="proof-num">2.847</span><span class="proof-label">Pasangan Bahagia</span></div>
+  <div class="proof-divider"></div>
+  <div class="proof-item"><span class="proof-num">8</span><span class="proof-label">Tema Eksklusif</span></div>
+  <div class="proof-divider"></div>
+  <div class="proof-item"><span class="proof-num">5 mnt</span><span class="proof-label">Waktu Setup</span></div>
+  <div class="proof-divider"></div>
+  <div class="proof-item"><span class="proof-num">∞</span><span class="proof-label">Kenangan Tersimpan</span></div>
+</div>
+
+<!-- THEME SHOWCASE -->
+<section class="themes-outer" id="themes">
+  <div class="themes-header reveal">
+    <div class="eyebrow">8 Tema Eksklusif</div>
+    <h2 class="section-title">Mulai dari <em>perasaan apa?</em></h2>
+    <p class="section-sub" style="margin-top:12px">Setiap tema punya karakter, suasana, dan cerita tersendiri. Pilih yang paling mencerminkan kalian.</p>
+  </div>
+  <div class="marquee">
+    <div class="marquee-inner" id="marquee">
+      <!-- Set 1 -->
+      <div class="theme-showcase-card"><div class="tsc-screen ts-mimpi"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names">Rizky<br><span class="tsc-amp">&</span><br>Aulia</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 20 Juni 2026</div><div class="tsc-orn">✦  ✦  ✦</div></div><div class="tsc-label"><div class="tsc-theme-name">Mimpi Ungu</div><div class="tsc-theme-mood">Untuk jiwa-jiwa yang bermimpi besar</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-taman"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names">Bintang<br><span class="tsc-amp">&</span><br>Melati</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 14 Feb 2026</div><div class="tsc-orn">❧  ❧  ❧</div></div><div class="tsc-label"><div class="tsc-theme-name">Taman Rahasia</div><div class="tsc-theme-mood">Hangat seperti rumah, indah seperti bunga</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-malam"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names">Adrian<br><span class="tsc-amp">&</span><br>Celine</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 07 Mar 2026</div><div class="tsc-orn">♡  ♡  ♡</div></div><div class="tsc-label"><div class="tsc-theme-name">Malam Pertama</div><div class="tsc-theme-mood">Intens, dalam, tak terlupakan</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-cahaya"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names" style="font-family:'Arial',sans-serif;font-weight:700;letter-spacing:-1px;text-transform:uppercase;font-size:14px">Kevin<br><span class="tsc-amp" style="font-weight:400;font-style:normal">&</span><br>Jessica</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 11 Apr 2026</div><div class="tsc-orn">◈  ◈  ◈</div></div><div class="tsc-label"><div class="tsc-theme-name">Cahaya Kota</div><div class="tsc-theme-mood">Modern, berani, penuh cahaya</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-surga"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names" style="font-family:'Georgia',serif;font-size:18px">Dewa<br><span class="tsc-amp">&</span><br>Ayu</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 20 Jun 2026</div><div class="tsc-orn">⸙  ⸙  ⸙</div></div><div class="tsc-label"><div class="tsc-theme-name">Surga Hijau</div><div class="tsc-theme-mood">Kesegaran alam di hari terpenting</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-bisikan"><div class="tsc-pretitle" style="color:#8a8878">The Wedding of</div><div class="tsc-names" style="font-family:'Arial',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#1a1a18">James<br><span class="tsc-amp" style="color:#bab8b0;font-size:10px">&</span><br>Sarah</div><div class="tsc-line" style="background:#1a1a18"></div><div class="tsc-date" style="color:#1a1a18;border-color:rgba(0,0,0,0.15)">Sabtu, 25 Jul 2026</div><div class="tsc-orn" style="color:#1a1a18">—  —  —</div></div><div class="tsc-label" style="background:#eae9e4;border-top-color:#dddbd4"><div class="tsc-theme-name" style="color:#2a2820">Bisikan Putih</div><div class="tsc-theme-mood" style="color:#888">Keindahan sejati tak perlu kata-kata</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-warisan"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names" style="font-family:'Georgia',serif;letter-spacing:1px;font-size:14px">Thomas<br><span class="tsc-amp">&</span><br>Eleanor</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 01 Agt 2026</div><div class="tsc-orn">✦  ✦  ✦</div></div><div class="tsc-label"><div class="tsc-theme-name">Warisan Cinta</div><div class="tsc-theme-mood">Seperti cerita yang akan dikenang selamanya</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-langit"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names" style="font-style:italic">Langit<br><span class="tsc-amp">&</span><br>Bintari</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 12 Sep 2026</div><div class="tsc-orn">✦  ✦  ✦</div></div><div class="tsc-label"><div class="tsc-theme-name">Langit Malam</div><div class="tsc-theme-mood">Di bawah bintang, kita bersatu</div></div></div>
+      <!-- Set 2 duplicate for seamless loop -->
+      <div class="theme-showcase-card"><div class="tsc-screen ts-mimpi"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names">Rizky<br><span class="tsc-amp">&</span><br>Aulia</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 20 Juni 2026</div><div class="tsc-orn">✦  ✦  ✦</div></div><div class="tsc-label"><div class="tsc-theme-name">Mimpi Ungu</div><div class="tsc-theme-mood">Untuk jiwa-jiwa yang bermimpi besar</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-taman"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names">Bintang<br><span class="tsc-amp">&</span><br>Melati</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 14 Feb 2026</div><div class="tsc-orn">❧  ❧  ❧</div></div><div class="tsc-label"><div class="tsc-theme-name">Taman Rahasia</div><div class="tsc-theme-mood">Hangat seperti rumah, indah seperti bunga</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-malam"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names">Adrian<br><span class="tsc-amp">&</span><br>Celine</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 07 Mar 2026</div><div class="tsc-orn">♡  ♡  ♡</div></div><div class="tsc-label"><div class="tsc-theme-name">Malam Pertama</div><div class="tsc-theme-mood">Intens, dalam, tak terlupakan</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-cahaya"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names" style="font-family:'Arial',sans-serif;font-weight:700;letter-spacing:-1px;text-transform:uppercase;font-size:14px">Kevin<br><span class="tsc-amp" style="font-weight:400;font-style:normal">&</span><br>Jessica</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 11 Apr 2026</div><div class="tsc-orn">◈  ◈  ◈</div></div><div class="tsc-label"><div class="tsc-theme-name">Cahaya Kota</div><div class="tsc-theme-mood">Modern, berani, penuh cahaya</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-surga"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names" style="font-family:'Georgia',serif;font-size:18px">Dewa<br><span class="tsc-amp">&</span><br>Ayu</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 20 Jun 2026</div><div class="tsc-orn">⸙  ⸙  ⸙</div></div><div class="tsc-label"><div class="tsc-theme-name">Surga Hijau</div><div class="tsc-theme-mood">Kesegaran alam di hari terpenting</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-bisikan"><div class="tsc-pretitle" style="color:#8a8878">The Wedding of</div><div class="tsc-names" style="font-family:'Arial',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#1a1a18">James<br><span class="tsc-amp" style="color:#bab8b0;font-size:10px">&</span><br>Sarah</div><div class="tsc-line" style="background:#1a1a18"></div><div class="tsc-date" style="color:#1a1a18;border-color:rgba(0,0,0,0.15)">Sabtu, 25 Jul 2026</div><div class="tsc-orn" style="color:#1a1a18">—  —  —</div></div><div class="tsc-label" style="background:#eae9e4;border-top-color:#dddbd4"><div class="tsc-theme-name" style="color:#2a2820">Bisikan Putih</div><div class="tsc-theme-mood" style="color:#888">Keindahan sejati tak perlu kata-kata</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-warisan"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names" style="font-family:'Georgia',serif;letter-spacing:1px;font-size:14px">Thomas<br><span class="tsc-amp">&</span><br>Eleanor</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 01 Agt 2026</div><div class="tsc-orn">✦  ✦  ✦</div></div><div class="tsc-label"><div class="tsc-theme-name">Warisan Cinta</div><div class="tsc-theme-mood">Seperti cerita yang akan dikenang selamanya</div></div></div>
+      <div class="theme-showcase-card"><div class="tsc-screen ts-langit"><div class="tsc-pretitle">The Wedding of</div><div class="tsc-names" style="font-style:italic">Langit<br><span class="tsc-amp">&</span><br>Bintari</div><div class="tsc-line"></div><div class="tsc-date">Sabtu, 12 Sep 2026</div><div class="tsc-orn">✦  ✦  ✦</div></div><div class="tsc-label"><div class="tsc-theme-name">Langit Malam</div><div class="tsc-theme-mood">Di bawah bintang, kita bersatu</div></div></div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:40px;">
+    <a href="builder.html" class="btn-rose" style="display:inline-flex">Pilih Tema Kalian →</a>
+  </div>
+</section>
+
+<!-- EMOTIONAL QUOTE -->
+<section class="emotion-section" style="position:relative;z-index:2;border-top:1px solid var(--border);">
+  <div class="emotion-quote reveal">"Tamu kami bertanya undangan kami beli di mana. Padahal kami buat sendiri dalam 10 menit."</div>
+  <div class="emotion-source" style="margin-top:16px;opacity:.4">— Rizky & Aulia, Jakarta · Tema Mimpi Ungu</div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="reveal">
+    <div class="eyebrow">Kenapa Kisah?</div>
+    <h2 class="section-title">Semua yang kalian butuhkan,<br><em>tanpa yang tidak.</em></h2>
+  </div>
+  <div class="features-bento reveal">
+    <div class="bento-card wide">
+      <span class="bento-icon">🎨</span>
+      <div class="bento-title">8 Tema yang Terasa Eksklusif</div>
+      <p class="bento-desc">Mimpi Ungu, Taman Rahasia, Malam Pertama, Cahaya Kota, Surga Hijau, Bisikan Putih, Warisan Cinta, Langit Malam. Setiap tema punya karakter, suasana, dan motion uniknya sendiri.</p>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">✨</span>
+      <div class="bento-title">Animasi Pembuka</div>
+      <p class="bento-desc">Tamu mengetuk "Buka Undangan" dan menyaksikan animasi khas tema kalian. Bukan sekadar halaman — ini adalah momen.</p>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">⏱</span>
+      <div class="bento-title">Countdown Real-Time</div>
+      <p class="bento-desc">Tamu bisa melihat hari, jam, menit, dan detik menuju hari bahagia kalian.</p>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">✉️</span>
+      <div class="bento-title">RSVP & Ucapan</div>
+      <p class="bento-desc">Form konfirmasi kehadiran dan feed ucapan langsung dari tamu. Bisa diexport ke Excel kapan saja.</p>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">📸</span>
+      <div class="bento-title">Galeri Prewedding</div>
+      <p class="bento-desc">Upload foto-foto terbaik kalian. Tampil dalam galeri yang disesuaikan estetika tema.</p>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">🔗</span>
+      <div class="bento-title">Link Pribadi Selamanya</div>
+      <p class="bento-desc">Dapatkan kisah.id/nama-kalian — URL permanen yang menjadi rumah digital kisah pernikahan kalian.</p>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">💌</span>
+      <div class="bento-title">Personalisasi Per Tamu</div>
+      <p class="bento-desc">Setiap link bisa menampilkan nama tamu yang berbeda. Undangan terasa personal untuk setiap orang yang menerimanya.</p>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">🎵</span>
+      <div class="bento-title">Musik Latar</div>
+      <p class="bento-desc">Lagu pilihan kalian mengalun saat undangan dibuka. Satu detail kecil yang membuat perbedaan besar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="section reveal">
+    <div class="eyebrow">Cara Kerja</div>
+    <h2 class="section-title">Siap dalam <em>5 menit.</em><br>Dikenang selamanya.</h2>
+    <div class="steps">
+      <div class="step"><div class="step-circle">1</div><div class="step-title">Pilih Perasaan</div><p class="step-desc">Browse 8 tema dan temukan satu yang paling mencerminkan jiwa pernikahan kalian.</p></div>
+      <div class="step"><div class="step-circle">2</div><div class="step-title">Ceritakan Kisah</div><p class="step-desc">Isi nama, tanggal, lokasi, dan cerita cinta kalian. Nama kalian langsung muncul di preview.</p></div>
+      <div class="step"><div class="step-circle">3</div><div class="step-title">Rasakan Hasilnya</div><p class="step-desc">Lihat undangan kalian seperti tamu melihatnya — lengkap dengan animasi dan musik.</p></div>
+      <div class="step"><div class="step-circle">4</div><div class="step-title">Sebarkan Cinta</div><p class="step-desc">Dapatkan link unik dan kirim ke semua tamu via WhatsApp. Mudah, cepat, tak terlupakan.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="reveal">
+    <div class="eyebrow">Harga</div>
+    <h2 class="section-title">Investasi terkecil untuk<br><em>kenangan terbesar.</em></h2>
+    <p class="section-sub">Bayar sekali. Undangan aktif selamanya.</p>
+  </div>
+  <div class="pricing-grid reveal">
+    <div class="price-card">
+      <div class="price-plan">Gratis</div>
+      <div class="price-amount">Rp 0</div>
+      <div class="price-period">Coba dulu, tanpa kartu kredit</div>
+      <div class="price-div"></div>
+      <ul class="price-features">
+        <li>1 undangan aktif</li>
+        <li>3 tema dasar</li>
+        <li>Countdown timer</li>
+        <li>RSVP form</li>
+        <li class="dim">Galeri foto</li>
+        <li class="dim">Musik latar</li>
+        <li class="dim">Link pribadi (kisah.id/nama)</li>
+        <li class="dim">Hapus watermark</li>
+      </ul>
+      <a href="builder.html" class="price-btn">Mulai Gratis</a>
+    </div>
+    <div class="price-card feat">
+      <div class="price-plan">Premium</div>
+      <div class="price-amount">Rp 99k</div>
+      <div class="price-period">Bayar sekali · aktif selamanya</div>
+      <div class="price-div"></div>
+      <ul class="price-features">
+        <li>1 undangan premium</li>
+        <li>Semua 8 tema eksklusif</li>
+        <li>Animasi pembuka khas tema</li>
+        <li>RSVP + export Excel</li>
+        <li>Galeri foto (20 foto)</li>
+        <li>Musik latar</li>
+        <li>Link kisah.id/nama-kalian</li>
+        <li class="dim">Custom domain sendiri</li>
+      </ul>
+      <a href="builder.html" class="price-btn">Mulai Kisah Kalian</a>
+    </div>
+    <div class="price-card">
+      <div class="price-plan">Elite</div>
+      <div class="price-amount">Rp 199k</div>
+      <div class="price-period">Bayar sekali · aktif selamanya</div>
+      <div class="price-div"></div>
+      <ul class="price-features">
+        <li>1 undangan elite</li>
+        <li>Semua fitur Premium</li>
+        <li>Galeri foto unlimited</li>
+        <li>Custom domain sendiri</li>
+        <li>Hapus watermark</li>
+        <li>Animasi eksklusif tambahan</li>
+        <li>Witness counter live</li>
+        <li>Priority support via WA</li>
+      </ul>
+      <a href="builder.html" class="price-btn">Pilih Elite</a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section">
+  <div class="reveal">
+    <div class="eyebrow">Kata Mereka</div>
+    <h2 class="section-title">Pasangan yang sudah<br><em>merasakannya.</em></h2>
+  </div>
+  <div class="testi-grid reveal">
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"Beneran mudah banget. 10 menit udah jadi dan hasilnya bikin kita sendiri terharu ngeliatnya."</p>
+      <div class="testi-author"><div class="testi-av" style="background:#2d1f40;color:#e8d4f8">A</div><div><div class="testi-name">Ayu & Bagas</div><div class="testi-loc">Jakarta · Tema Mimpi Ungu</div></div></div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"Tamunya pada nanya undangan kita dari mana. Padahal kita bikin sendiri. Itulah kekuatan Kisah."</p>
+      <div class="testi-author"><div class="testi-av" style="background:#2e0d1c;color:#f4c0d0">R</div><div><div class="testi-name">Rania & Daffa</div><div class="testi-loc">Bandung · Tema Malam Pertama</div></div></div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"Worth banget. Undangan fisik kami 2 juta, tapi yang digital ini 99rb dan lebih berkesan menurut tamu."</p>
+      <div class="testi-author"><div class="testi-av" style="background:#102010;color:#d0eec8">S</div><div><div class="testi-name">Sella & Kevin</div><div class="testi-loc">Bali · Tema Surga Hijau</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="reveal">
+    <div class="eyebrow">Pertanyaan</div>
+    <h2 class="section-title">Yang sering <em>ditanyakan.</em></h2>
+  </div>
+  <div class="faq-list reveal">
+    <div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Apakah undangan bisa dibuka di HP dan laptop?<div class="faq-icon">+</div></div><div class="faq-a">Ya, semua tema Kisah sudah fully responsive dan dioptimalkan untuk mobile. Tamu bisa buka via link di browser tanpa install aplikasi apapun.</div></div>
+    <div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Berapa lama undangan aktif setelah dibeli?<div class="faq-icon">+</div></div><div class="faq-a">Selamanya. Tidak ada biaya langganan. Bayar sekali dan kisah kalian tersimpan tanpa batas waktu.</div></div>
+    <div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Bisa ganti tema setelah selesai buat?<div class="faq-icon">+</div></div><div class="faq-a">Bisa kapan saja. Data yang sudah diisi akan otomatis terpindah ke tema baru tanpa perlu mengisi ulang.</div></div>
+    <div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Bagaimana cara share ke tamu undangan?<div class="faq-icon">+</div></div><div class="faq-a">Kamu mendapat link unik yang bisa langsung dishare via WhatsApp atau Instagram. Bisa juga personalisasi nama tamu di setiap link yang dikirim.</div></div>
+    <div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Bisa pakai foto prewedding sendiri?<div class="faq-icon">+</div></div><div class="faq-a">Tentu. Upload foto untuk cover, galeri, dan profil mempelai. Format JPG/PNG maksimal 5MB per foto.</div></div>
+    <div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Apa bedanya Kisah dengan platform lain?<div class="faq-icon">+</div></div><div class="faq-a">Platform lain menjual fitur. Kisah menjual perasaan. Setiap tema dirancang sebagai pengalaman emosional — dari animasi pembuka, motion khas, hingga copy yang membuat tamu tersentuh sebelum membaca nama kalian.</div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-band">
+  <div class="cta-title reveal">Kisah kalian layak<br>disampaikan dengan <em>indah.</em></div>
+  <p class="cta-sub reveal">Mulai gratis. Tanpa kartu kredit. Publish kapan saja.</p>
+  <div class="reveal"><a href="builder.html" class="btn-rose" style="font-size:12px">Sebarkan Cinta Kalian →</a></div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Kisah</div>
+  <ul class="footer-links">
+    <li><a href="#">Tentang</a></li>
+    <li><a href="#">Blog</a></li>
+    <li><a href="#">Kontak</a></li>
+    <li><a href="https://wa.me/6281234567890">WhatsApp</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 Kisah. Made with ♡ in Bali.</div>
+</footer>
+
+<script>
+// cursor
+var cur=document.getElementById('cur'),ring=document.getElementById('curRing');
+document.addEventListener('mousemove',function(e){
+  cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';
+  ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';
+});
+document.querySelectorAll('a,button,.faq-item,.theme-showcase-card').forEach(function(el){
+  el.addEventListener('mouseenter',function(){cur.style.width='12px';cur.style.height='12px';ring.style.width='44px';ring.style.height='44px';});
+  el.addEventListener('mouseleave',function(){cur.style.width='6px';cur.style.height='6px';ring.style.width='28px';ring.style.height='28px';});
+});
+
+// nav scroll
+window.addEventListener('scroll',function(){
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>60);
+});
+
+// reveal
+var obs=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el);});
+</script>
+</body>
+</html>
