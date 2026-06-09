@@ -1448,23 +1448,14 @@ function _doRender() {
 
   // ── SCRIPTS inside iframe ──
   '<script>' +
-  // Theme + YouTube config injected dynamically
+  // Theme + YouTube config — resolved as pure JS objects at runtime
   'var THEME="' + t + '";' +
-  'var YT_ID="' + YOUTUBE_IDS.get(t, 'jfKfPfyJRdk') + '";' +
-  'var CV_TYPE="' + {
-      'aesthetic':'orbs','cottagecore':'petals','darkromance':'hearts',
-      'y2k':'grid','bali':'leaves','minimalist':'lines','vintage':'orbs','celestial':'stars'
-  }.get(t,'orbs') + '";' +
-  'var CV_COLORS=' + str({
-      'aesthetic':['#6a0dad','#3d1f7a','#9b4dca'],
-      'cottagecore':['#4a2800','#8b5a00','#c8a050'],
-      'darkromance':['#5a0015','#8b001f','#cc2244'],
-      'y2k':['#001a40','#003380','#0055cc'],
-      'bali':['#0a200a','#1a4a1a','#2d7a2d'],
-      'minimalist':['#c0bdb8','#a8a5a0','#909090'],
-      'vintage':['#2a1800','#5a3800','#8a5800'],
-      'celestial':['#05071a','#0d1230','#1a1f50'],
-  }.get(t, ['#222','#333','#444'])) + ';' +
+  'var _YT_MAP={"aesthetic":"jfKfPfyJRdk","cottagecore":"HuFYqnbVbzY","darkromance":"4To1HTe_7GQ","y2k":"Dxx6YCosP9c","bali":"UfcAVejslrU","minimalist":"UiTzCQd3FGk","vintage":"EhxqpnlGrBg","celestial":"aXItOY0sLRY"};' +
+  'var YT_ID=_YT_MAP[THEME]||"jfKfPfyJRdk";' +
+  'var _CV_MAP={"aesthetic":['#6a0dad', '#3d1f7a', '#9b4dca'],"cottagecore":['#4a2800', '#8b5a00', '#c8a050'],"darkromance":['#5a0015', '#8b001f', '#cc2244'],"y2k":['#001a40', '#003380', '#0055cc'],"bali":['#0a200a', '#1a4a1a', '#2d7a2d'],"minimalist":['#c0bdb8', '#a8a5a0', '#909090'],"vintage":['#2a1800', '#5a3800', '#8a5800'],"celestial":['#05071a', '#0d1230', '#1a1f50']};' +
+  'var CV_COLORS=_CV_MAP[THEME]||["#222","#333","#444"];' +
+  'var _CT_MAP={aesthetic:"orbs",cottagecore:"petals",darkromance:"hearts",y2k:"grid",bali:"leaves",minimalist:"lines",vintage:"orbs",celestial:"stars"};' +
+  'var CV_TYPE=_CT_MAP[THEME]||"orbs";' +
 
   // ── CANVAS FLUID BACKGROUND ──
   '(function(){' +
