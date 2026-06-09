@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kisah — Buat Undangan Kalian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@500;600&family=Cinzel:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Josefin+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0a0907;--surface:#111009;--card:#161410;--panel:#13110e;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --gold:#c9a96e;--gold-dim:rgba(201,169,110,0.12);--gold-mid:rgba(201,169,110,0.35);
+  --text:#f0ebe3;--muted:#6a5f52;--sub:#a89880;
+  --serif:'Instrument Serif',serif;--sans:'DM Sans',sans-serif;--display:'Syne',sans-serif;
+  --panel-w:300px;
+}
+html{height:100%;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* ── TOP BAR ── */
+.topbar{
+  height:52px;flex-shrink:0;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;z-index:100;
+}
+.topbar-logo{font-family:var(--serif);font-size:20px;font-style:italic;color:var(--text);text-decoration:none;letter-spacing:-.3px;}
+.topbar-logo em{font-style:normal;color:var(--gold);}
+
+.step-tabs{display:flex;gap:2px;}
+.step-tab{
+  padding:6px 16px;font-family:var(--display);font-size:11px;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;color:var(--muted);
+  background:transparent;border:none;cursor:pointer;
+  border-radius:3px;transition:all 0.2s;display:flex;align-items:center;gap:6px;
+}
+.step-tab:hover{color:var(--sub);background:rgba(255,255,255,0.03);}
+.step-tab.active{color:var(--gold);background:var(--gold-dim);}
+.step-tab.done{color:var(--sub);}
+.step-tab .check{color:var(--gold);font-size:10px;display:none;}
+.step-tab.done .check{display:inline;}
+
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.btn-preview-mobile{
+  padding:7px 14px;background:transparent;border:1px solid var(--border2);
+  color:var(--sub);font-family:var(--sans);font-size:12px;
+  border-radius:3px;cursor:pointer;transition:all 0.2s;
+}
+.btn-preview-mobile:hover{border-color:var(--gold-mid);color:var(--text);}
+.btn-publish{
+  padding:7px 20px;background:var(--gold);color:#0a0907;
+  font-family:var(--display);font-size:11px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;border:none;
+  border-radius:3px;cursor:pointer;transition:all 0.2s;
+}
+.btn-publish:hover{background:#e0c080;}
+
+/* ── MAIN LAYOUT ── */
+.main{display:flex;flex:1;overflow:hidden;}
+
+/* ── LEFT PANEL ── */
+.left-panel{
+  width:var(--panel-w);flex-shrink:0;
+  background:var(--panel);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+
+.panel-body{flex:1;overflow-y:auto;padding:24px 20px;}
+.panel-body::-webkit-scrollbar{width:3px;}
+.panel-body::-webkit-scrollbar-track{background:transparent;}
+.panel-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* step panels */
+.step-panel{display:none;}
+.step-panel.active{display:block;}
+
+/* ── THEME GRID ── */
+.theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.theme-card{
+  border:1.5px solid var(--border);border-radius:8px;
+  overflow:hidden;cursor:pointer;transition:all 0.25s;position:relative;
+}
+.theme-card:hover{border-color:var(--gold-mid);transform:translateY(-2px);}
+.theme-card.selected{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
+.theme-thumb{
+  height:130px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:4px;
+  position:relative;overflow:hidden;
+}
+.theme-thumb-name{font-size:13px;font-weight:600;z-index:1;position:relative;}
+.theme-thumb-sub{font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:0.6;z-index:1;position:relative;}
+.theme-check{
+  position:absolute;top:6px;right:6px;width:16px;height:16px;
+  background:var(--gold);border-radius:50%;display:none;
+  align-items:center;justify-content:center;font-size:9px;color:#0a0907;font-weight:700;z-index:2;
+}
+.theme-card.selected .theme-check{display:flex;}
+.theme-label{
+  padding:8px 10px;font-size:11px;color:var(--sub);
+  border-top:1px solid var(--border);background:rgba(0,0,0,0.2);
+}
+
+/* theme thumb backgrounds — mini invitation previews */
+.tt-aesthetic{background:#110d1a;color:#e8d4f8;}
+.tt-cottagecore{background:#1a160c;color:#e8d8b0;}
+.tt-darkromance{background:#0f0810;color:#f0d0da;}
+.tt-y2k{background:#08101e;color:#c0e0ff;}
+.tt-bali{background:#091408;color:#d0eec8;}
+.tt-minimalist{background:#f5f4f0;color:#2a2820;}
+.tt-vintage{background:#160e08;color:#e8d0a0;}
+.tt-celestial{background:#070918;color:#c8d0f0;}
+
+/* popularity badge */
+
+/* ── FORM ELEMENTS ── */
+.field{margin-bottom:18px;}
+.field-label{
+  display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:6px;
+}
+.field-input,.field-textarea,.field-select{
+  width:100%;background:rgba(255,255,255,0.04);
+  border:1px solid var(--border2);color:var(--text);
+  padding:9px 12px;font-size:13px;font-family:var(--sans);
+  border-radius:4px;outline:none;transition:border-color 0.2s;
+}
+.field-input:focus,.field-textarea:focus,.field-select:focus{border-color:var(--gold-mid);}
+.field-input::placeholder,.field-textarea::placeholder{color:var(--muted);}
+.field-textarea{height:72px;resize:none;}
+.field-select option{background:#1a1510;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+.field-hint{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;}
+
+/* upload area */
+.upload-area{
+  border:1px dashed var(--border2);border-radius:6px;
+  padding:20px;text-align:center;cursor:pointer;
+  transition:all 0.2s;position:relative;
+}
+.upload-area:hover{border-color:var(--gold-mid);background:var(--gold-dim);}
+.upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:22px;margin-bottom:6px;}
+.upload-text{font-size:12px;color:var(--muted);}
+.upload-text strong{color:var(--sub);display:block;margin-bottom:2px;}
+
+/* section separator */
+.sep{height:1px;background:var(--border);margin:20px 0;}
+.sec-title{font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+
+/* toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.toggle-label{font-size:13px;color:var(--sub);}
+.toggle-wrap{display:flex;align-items:center;gap:8px;}
+.toggle{
+  width:36px;height:20px;background:#2a2520;border-radius:10px;
+  position:relative;cursor:pointer;border:1px solid var(--border2);
+  transition:background 0.3s;flex-shrink:0;
+}
+.toggle.on{background:rgba(201,169,110,0.25);}
+.toggle::after{
+  content:'';position:absolute;width:14px;height:14px;
+  border-radius:50%;background:#4a3f32;top:2px;left:2px;
+  transition:all 0.3s;
+}
+.toggle.on::after{left:18px;background:var(--gold);}
+
+/* color row */
+.color-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.cswatch{
+  width:24px;height:24px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:all 0.2s;
+}
+.cswatch:hover,.cswatch.sel{border-color:#fff;transform:scale(1.2);}
+
+/* panel footer */
+.panel-footer{
+  padding:16px 20px;border-top:1px solid var(--border);
+  display:flex;gap:8px;flex-shrink:0;background:var(--panel);
+}
+.btn-back{
+  flex:1;padding:10px;background:transparent;
+  border:1px solid var(--border2);color:var(--sub);
+  font-family:var(--display);font-size:11px;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;border-radius:3px;cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-back:hover{border-color:var(--gold-mid);color:var(--text);}
+.btn-next{
+  flex:2;padding:10px;background:var(--gold);color:#0a0907;
+  border:none;font-family:var(--display);font-size:11px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;border-radius:3px;cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-next:hover{background:#e0c080;}
+
+/* ── MIDDLE: PREVIEW ── */
+.preview-area{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;background:#0e0c0a;overflow:hidden;position:relative;
+}
+
+.preview-bar{
+  width:100%;padding:10px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.preview-bar-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.preview-zoom{display:flex;gap:6px;}
+.zoom-btn{
+  width:28px;height:28px;background:transparent;border:1px solid var(--border);
+  color:var(--sub);border-radius:3px;cursor:pointer;font-size:13px;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;
+}
+.zoom-btn:hover{border-color:var(--gold-mid);color:var(--gold);}
+
+.preview-scroll{
+  flex:1;overflow-y:auto;width:100%;
+  display:flex;justify-content:center;align-items:flex-start;
+  padding:32px 24px;
+}
+.preview-scroll::-webkit-scrollbar{width:4px;}
+.preview-scroll::-webkit-scrollbar-thumb{background:var(--border2);}
+
+.device{
+  width:420px;flex-shrink:0;
+  border-radius:40px;border:9px solid #222018;
+  box-shadow:0 40px 80px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.04);
+  overflow:hidden;background:#fff;position:relative;
+  transition:transform 0.3s;
+}
+.device-notch{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:90px;height:22px;background:#222018;
+  border-radius:0 0 12px 12px;z-index:10;
+}
+.device-screen{
+  width:100%;min-height:640px;overflow-y:auto;
+  padding-top:22px;
+}
+.device-screen::-webkit-scrollbar{display:none;}
+
+/* ── RIGHT PANEL ── */
+.right-panel{
+  width:240px;flex-shrink:0;background:var(--panel);
+  border-left:1px solid var(--border);overflow-y:auto;
+  padding:20px 16px;display:none;
+}
+.right-panel::-webkit-scrollbar{width:3px;}
+.right-panel::-webkit-scrollbar-thumb{background:var(--border2);}
+
+.rp-title{font-family:var(--display);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+
+.quick-btn{
+  width:100%;padding:9px 12px;background:transparent;
+  border:1px solid var(--border);color:var(--sub);
+  font-family:var(--sans);font-size:12px;border-radius:4px;
+  cursor:pointer;text-align:left;margin-bottom:6px;
+  transition:all 0.2s;display:flex;align-items:center;gap:8px;
+}
+.quick-btn:hover{border-color:var(--gold-mid);color:var(--text);background:var(--gold-dim);}
+.quick-btn .qi{font-size:15px;width:20px;flex-shrink:0;}
+.quick-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-dim);}
+
+.rp-sep{height:1px;background:var(--border);margin:16px 0;}
+
+.rp-stat{margin-bottom:12px;}
+.rp-stat-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.rp-stat-val{font-size:14px;color:var(--text);}
+
+/* share preview */
+.share-box{
+  background:rgba(201,169,110,0.06);border:1px solid var(--gold-mid);
+  border-radius:6px;padding:12px;margin-top:16px;
+}
+.share-url{
+  font-size:11px;color:var(--sub);word-break:break-all;
+  background:rgba(0,0,0,0.3);padding:6px 8px;border-radius:3px;
+  margin-bottom:8px;font-family:monospace;
+}
+.copy-btn{
+  width:100%;padding:7px;background:var(--gold-dim);border:1px solid var(--gold-mid);
+  color:var(--gold);font-family:var(--display);font-size:10px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;border-radius:3px;cursor:pointer;
+  transition:all 0.2s;
+}
+.copy-btn:hover{background:var(--gold);color:#0a0907;}
+
+/* ── THEME PREVIEW STYLES (actual invitation) ── */
+/* shared */
+.inv{width:100%;font-size:14px;}
+.inv-cover{padding:48px 24px 36px;text-align:center;position:relative;overflow:hidden;}
+.inv-pretitle{font-size:9px;letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;}
+.inv-names{font-size:38px;line-height:1.1;margin-bottom:6px;}
+.inv-amp{font-size:32px;}
+.inv-datebadge{display:inline-block;padding:7px 18px;border:1px solid currentColor;font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-top:16px;opacity:0.7;}
+.inv-body{padding:24px 20px;text-align:center;}
+.inv-orn{display:block;font-size:14px;letter-spacing:8px;margin:16px 0;opacity:0.4;}
+.inv-verse{font-style:italic;font-size:12px;line-height:1.9;border-left:2px solid currentColor;padding-left:12px;text-align:left;margin-bottom:16px;opacity:0.7;}
+.inv-couple-grid{display:grid;grid-template-columns:1fr 28px 1fr;gap:6px;align-items:start;margin:16px 0;}
+.inv-photo{width:72px;height:90px;margin:0 auto 8px;border:1px dashed currentColor;opacity:0.3;display:flex;align-items:center;justify-content:center;font-size:9px;text-transform:uppercase;letter-spacing:1px;}
+.inv-pname{font-size:17px;margin-bottom:2px;}
+.inv-ppar{font-size:10px;line-height:1.6;opacity:0.6;}
+.inv-amp-c{display:flex;align-items:center;justify-content:center;padding-top:28px;font-size:24px;opacity:0.5;}
+.inv-event{padding:14px 16px;margin:8px 0;text-align:center;border-radius:3px;}
+.inv-etype{font-size:8px;letter-spacing:3px;text-transform:uppercase;margin-bottom:5px;opacity:0.6;}
+.inv-edate{font-size:16px;margin-bottom:2px;}
+.inv-etime{font-size:11px;font-style:italic;opacity:0.6;margin-bottom:4px;}
+.inv-evenue{font-size:10px;line-height:1.6;opacity:0.6;}
+.inv-footer{padding:28px 20px;text-align:center;}
+.inv-footer-names{font-size:22px;margin-bottom:8px;}
+.inv-footer-text{font-size:10px;line-height:1.8;opacity:0.5;}
+
+/* AESTHETIC */
+.th-aesthetic{background:#110d1a;color:#e8d4f8;font-family:'DM Sans',sans-serif;}
+.th-aesthetic .inv-cover{background:radial-gradient(ellipse at 50% 0%,#2d1f40 0%,#110d1a 65%);}
+.th-aesthetic .inv-pretitle{color:#b47eff;}
+.th-aesthetic .inv-names{font-family:'Syne',sans-serif;font-weight:700;font-size:32px;letter-spacing:-1px;color:#f0e4ff;}
+.th-aesthetic .inv-amp{color:#b47eff;}
+.th-aesthetic .inv-datebadge{border-color:rgba(180,126,255,0.4);color:#b47eff;}
+.th-aesthetic .inv-orn{color:#5a3a8a;}
+.th-aesthetic .inv-event{background:rgba(180,126,255,0.06);border:1px solid rgba(180,126,255,0.15);}
+.th-aesthetic .inv-footer{background:#0e0a18;}
+
+/* COTTAGECORE */
+.th-cottagecore{background:#1a160c;color:#e8d8b0;font-family:'Cormorant Garamond',serif;}
+.th-cottagecore .inv-cover{background:linear-gradient(180deg,#2a2010,#1a160c);}
+.th-cottagecore .inv-pretitle{color:#c8a060;font-family:'Josefin Sans',sans-serif;}
+.th-cottagecore .inv-names{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:40px;color:#f0e0c0;}
+.th-cottagecore .inv-amp{color:#a07840;font-style:italic;}
+.th-cottagecore .inv-datebadge{border-color:rgba(160,120,60,0.4);color:#a07840;}
+.th-cottagecore .inv-orn{color:#4a3820;}
+.th-cottagecore .inv-event{background:rgba(160,120,60,0.08);border:1px solid rgba(160,120,60,0.2);}
+.th-cottagecore .inv-footer{background:#14100a;}
+
+/* DARK ROMANCE */
+.th-darkromance{background:#0f0810;color:#f0d0da;font-family:'Cormorant Garamond',serif;}
+.th-darkromance .inv-cover{background:radial-gradient(ellipse at 50% 0%,#2e0d1c 0%,#0f0810 70%);}
+.th-darkromance .inv-pretitle{color:#e06080;font-family:'Josefin Sans',sans-serif;}
+.th-darkromance .inv-names{font-family:'Playfair Display',serif;font-size:36px;color:#fce8ee;}
+.th-darkromance .inv-amp{color:#e06080;font-style:italic;}
+.th-darkromance .inv-datebadge{border-color:rgba(224,96,128,0.3);color:#c05070;}
+.th-darkromance .inv-orn{color:#6a1f38;}
+.th-darkromance .inv-event{background:rgba(200,60,90,0.07);border:1px solid rgba(200,60,90,0.18);}
+.th-darkromance .inv-footer{background:#0a0510;}
+
+/* Y2K */
+.th-y2k{background:#08101e;color:#c0e0ff;font-family:'DM Sans',sans-serif;}
+.th-y2k .inv-cover{background:linear-gradient(160deg,#0a1428,#081018);}
+.th-y2k .inv-pretitle{color:#60b0ff;font-family:'Syne',sans-serif;font-size:8px;}
+.th-y2k .inv-names{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;letter-spacing:-1px;color:#e0f0ff;text-transform:uppercase;}
+.th-y2k .inv-amp{color:#60b0ff;font-weight:400;}
+.th-y2k .inv-datebadge{border-color:rgba(96,176,255,0.3);color:#60b0ff;font-family:'Syne',sans-serif;}
+.th-y2k .inv-orn{color:#1a3060;}
+.th-y2k .inv-event{background:rgba(96,176,255,0.06);border:1px solid rgba(96,176,255,0.15);}
+.th-y2k .inv-footer{background:#060c18;}
+
+/* BALI */
+.th-bali{background:#091408;color:#d0eec8;font-family:'Cormorant Garamond',serif;}
+.th-bali .inv-cover{background:linear-gradient(180deg,#102010,#091408);}
+.th-bali .inv-pretitle{color:#70c068;font-family:'Josefin Sans',sans-serif;}
+.th-bali .inv-names{font-family:'Dancing Script',cursive;font-size:42px;font-weight:500;color:#e8f8e0;}
+.th-bali .inv-amp{color:#60b058;font-size:36px;}
+.th-bali .inv-datebadge{border-color:rgba(96,176,88,0.3);color:#70c068;}
+.th-bali .inv-orn{color:#2a5020;}
+.th-bali .inv-event{background:rgba(80,168,72,0.07);border:1px solid rgba(80,168,72,0.18);}
+.th-bali .inv-footer{background:#060e05;}
+
+/* MINIMALIST */
+.th-minimalist{background:#f5f4f0;color:#2a2820;font-family:'DM Sans',sans-serif;}
+.th-minimalist .inv-cover{background:#eeede8;border-bottom:1px solid #dddbd4;}
+.th-minimalist .inv-pretitle{color:#8a8878;font-family:'Syne',sans-serif;}
+.th-minimalist .inv-names{font-family:'Syne',sans-serif;font-weight:700;font-size:28px;letter-spacing:-0.5px;color:#1a1a18;text-transform:uppercase;}
+.th-minimalist .inv-amp{color:#bab8b0;font-weight:300;}
+.th-minimalist .inv-datebadge{border-color:#c8c6be;color:#8a8878;}
+.th-minimalist .inv-orn{color:#d4d2ca;}
+.th-minimalist .inv-event{background:#eeede8;border:1px solid #dddbd4;}
+.th-minimalist .inv-footer{background:#eeede8;border-top:1px solid #dddbd4;}
+
+/* VINTAGE */
+.th-vintage{background:#160e08;color:#e8d0a0;font-family:'Cormorant Garamond',serif;}
+.th-vintage .inv-cover{background:linear-gradient(180deg,#241408,#160e08);}
+.th-vintage .inv-pretitle{color:#c8a050;font-family:'Cinzel',serif;font-size:8px;}
+.th-vintage .inv-names{font-family:'Cinzel',serif;font-size:28px;letter-spacing:2px;color:#f0e0b0;}
+.th-vintage .inv-amp{color:#c8a050;font-size:26px;}
+.th-vintage .inv-datebadge{border-color:rgba(200,160,80,0.4);color:#a08040;}
+.th-vintage .inv-orn{color:#3a2808;}
+.th-vintage .inv-event{background:rgba(180,130,50,0.08);border:1px solid rgba(180,130,50,0.2);}
+.th-vintage .inv-footer{background:#100a04;}
+
+/* CELESTIAL */
+.th-celestial{background:#070918;color:#c8d0f0;font-family:'Cormorant Garamond',serif;}
+.th-celestial .inv-cover{background:radial-gradient(ellipse at 50% 0%,#12183a 0%,#070918 70%);}
+.th-celestial .inv-pretitle{color:#8090d0;font-family:'Josefin Sans',sans-serif;}
+.th-celestial .inv-names{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:40px;font-style:italic;color:#e0e8ff;}
+.th-celestial .inv-amp{color:#8090d0;}
+.th-celestial .inv-datebadge{border-color:rgba(128,144,208,0.3);color:#8090d0;}
+.th-celestial .inv-orn{color:#1a2050;}
+.th-celestial .inv-event{background:rgba(128,144,208,0.07);border:1px solid rgba(128,144,208,0.18);}
+.th-celestial .inv-footer{background:#040610;}
+
+/* ── COUNTDOWN WIDGET ── */
+.inv-countdown{display:flex;justify-content:center;gap:12px;padding:16px 20px;margin:8px 0;}
+.cd-unit{text-align:center;}
+.cd-num{font-size:28px;display:block;font-weight:300;}
+.cd-lab{font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:0.5;}
+.cd-dot{display:flex;align-items:flex-end;padding-bottom:14px;font-size:20px;opacity:0.3;}
+
+/* ── GALLERY WIDGET ── */
+.inv-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:0 0 4px;}
+.gal-item{aspect-ratio:3/4;opacity:0.25;border:1px dashed currentColor;display:flex;align-items:center;justify-content:center;font-size:8px;text-transform:uppercase;letter-spacing:1px;}
+
+/* ── RSVP WIDGET ── */
+.inv-rsvp{padding:20px;text-align:left;}
+.rsvp-field{width:100%;background:transparent;border:none;border-bottom:1px solid currentColor;padding:8px 0;font-size:12px;color:inherit;outline:none;font-family:inherit;margin-bottom:14px;opacity:0.6;}
+.rsvp-field::placeholder{color:inherit;}
+.rsvp-btn{display:inline-block;padding:8px 20px;border:1px solid currentColor;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;opacity:0.7;background:transparent;color:inherit;font-family:inherit;}
+
+/* ── WISHES ── */
+.inv-wishes{padding:16px 20px;}
+.wish-item{padding:12px 0;border-bottom:1px solid currentColor;border-bottom-color:rgba(255,255,255,0.07);}
+.wish-msg{font-size:11px;line-height:1.7;margin-bottom:4px;opacity:0.7;}
+.wish-name{font-size:9px;letter-spacing:1px;text-transform:uppercase;opacity:0.4;}
+
+/* ── MUSIC BAR ── */
+.inv-musicbar{
+  position:sticky;bottom:0;left:0;right:0;
+  padding:8px 16px;display:flex;align-items:center;gap:10px;
+  backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,0.06);
+  font-size:10px;
+}
+.music-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:0.5;animation:mbeat 1.2s ease-in-out infinite;}
+.music-dot:nth-child(2){animation-delay:0.2s;}
+.music-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes mbeat{0%,100%{transform:scaleY(1);}50%{transform:scaleY(1.8);}}
+.music-title{flex:1;opacity:0.5;font-style:italic;}
+
+
+/* ── EMOTIONAL ADDITIONS ── */
+.step-mood{
+  font-size:12px;color:var(--muted);font-style:italic;
+  line-height:1.7;margin-bottom:18px;margin-top:-8px;
+  padding:10px 12px;border-left:2px solid var(--gold-mid);
+  background:var(--gold-dim);border-radius:0 3px 3px 0;
+}
+.theme-mood-tag{
+  font-size:9px;font-style:italic;color:var(--muted);
+  font-family:var(--sans);font-weight:300;
+  display:block;margin-top:1px;line-height:1.4;
+}
+.theme-label{
+  padding:9px 10px;font-size:12px;color:var(--sub);
+  border-top:1px solid var(--border);background:rgba(0,0,0,0.2);
+  line-height:1.5;
+}
+
+/* opening reveal overlay on preview */
+.opening-overlay{
+  position:absolute;inset:0;z-index:50;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:opacity .6s ease;
+}
+.opening-overlay.hidden{opacity:0;pointer-events:none;}
+
+/* guest mode overlay on builder */
+.guest-mode-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:#000;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .4s;
+}
+.guest-mode-overlay.active{opacity:1;pointer-events:all;}
+.guest-iframe{
+  width:390px;height:844px;border:none;border-radius:44px;
+  box-shadow:0 48px 100px rgba(0,0,0,.9);
+  max-height:95vh;
+}
+.guest-close{
+  position:absolute;top:24px;right:24px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+  color:#fff;font-family:var(--sans);font-size:12px;letter-spacing:1px;
+  padding:8px 16px;border-radius:3px;cursor:pointer;
+  transition:background .2s;
+}
+.guest-close:hover{background:rgba(255,255,255,.2);}
+
+/* topbar logo serif */
+.topbar-logo{font-family:var(--serif) !important;}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.step-panel.active{animation:fadeIn 0.3s ease;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="index.html" class="topbar-logo">Kisah</a>
+
+  <div class="step-tabs">
+    <button class="step-tab active" id="tab1" onclick="goStep(1)">
+      <span class="check">✓</span> Perasaan
+    </button>
+    <button class="step-tab" id="tab2" onclick="goStep(2)">
+      <span class="check">✓</span> Kalian
+    </button>
+    <button class="step-tab" id="tab3" onclick="goStep(3)">
+      <span class="check">✓</span> Hari H
+    </button>
+    <button class="step-tab" id="tab4" onclick="goStep(4)">
+      <span class="check">✓</span> Sentuhan
+    </button>
+    <button class="step-tab" id="tab5" onclick="goStep(5)">
+      <span class="check">✓</span> Publish
+    </button>
+  </div>
+
+  <div class="topbar-right">
+    <button class="btn-preview-mobile" onclick="toggleFullPreview()">👁 Lihat seperti tamu →</button>
+    <button class="btn-publish" onclick="goStep(5)">Sebarkan Cinta →</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="panel-body">
+
+      <!-- STEP 1: THEME -->
+      <div class="step-panel active" id="panel1">
+        <div class="sec-title">Mulai dari perasaan apa?</div>
+        <div class="step-mood">Tema yang tepat akan membuat tamu berdecak kagum sebelum membaca satu kata pun.</div>
+                <div class="theme-grid">
+          <div class="theme-card selected" onclick="setTheme('aesthetic',this)">
+            <div class="theme-thumb tt-aesthetic">
+              <svg width="160" height="130" viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><defs><linearGradient id="grizky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2d1f40"/><stop offset="100%" stop-color="#110d1a"/></linearGradient></defs><rect width="160" height="130" fill="url(#grizky)"/><text x="80" y="20" text-anchor="middle" font-size="5" fill="#b47eff" opacity="0.6" letter-spacing="2" font-family="sans-serif">THE WEDDING OF</text><text x="80" y="40" text-anchor="middle" font-size="14" fill="#f0e4ff" font-family="Georgia,serif" font-weight="300">Rizky</text><text x="80" y="54" text-anchor="middle" font-size="10" fill="#b47eff" font-family="Georgia,serif" font-style="italic">&amp;</text><text x="80" y="72" text-anchor="middle" font-size="14" fill="#f0e4ff" font-family="Georgia,serif" font-weight="300">Aulia</text><line x1="50" y1="82" x2="110" y2="82" stroke="#b47eff" stroke-width="0.5" opacity="0.35"/><text x="80" y="93" text-anchor="middle" font-size="4.5" fill="#b47eff" opacity="0.65" letter-spacing="1.5" font-family="sans-serif">SABTU, 20 JUNI 2026</text><rect x="22" y="100" width="116" height="16" rx="2" fill="#b47eff" opacity="0.07"/><rect x="22" y="100" width="116" height="16" rx="2" stroke="#b47eff" stroke-width="0.4" fill="none" opacity="0.18"/><text x="80" y="110.5" text-anchor="middle" font-size="5" fill="#f0e4ff" opacity="0.45" font-family="sans-serif">&#9962; Pemberkatan  &amp;  &#127818; Resepsi</text><text x="80" y="125" text-anchor="middle" font-size="5" fill="#b47eff" opacity="0.3" letter-spacing="3" font-family="sans-serif">&#10022; &#10022; &#10022;</text></svg>
+              <div class="theme-check">&#10003;</div>
+            </div>
+            <div class="theme-label">🌙 Mimpi Ungu<br><span class="theme-mood-tag">Untuk jiwa yang bermimpi besar</span></div>
+          </div>
+          <div class="theme-card" onclick="setTheme('cottagecore',this)">
+            <div class="theme-thumb tt-cottagecore">
+              <svg width="160" height="130" viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><defs><linearGradient id="gbintang" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a2010"/><stop offset="100%" stop-color="#1a160c"/></linearGradient></defs><rect width="160" height="130" fill="url(#gbintang)"/><text x="80" y="20" text-anchor="middle" font-size="5" fill="#c8a060" opacity="0.6" letter-spacing="2" font-family="sans-serif">THE WEDDING OF</text><text x="80" y="40" text-anchor="middle" font-size="14" fill="#f0e0c0" font-family="Georgia,serif" font-weight="300">Bintang</text><text x="80" y="54" text-anchor="middle" font-size="10" fill="#a07840" font-family="Georgia,serif" font-style="italic">&amp;</text><text x="80" y="72" text-anchor="middle" font-size="14" fill="#f0e0c0" font-family="Georgia,serif" font-weight="300">Melati</text><line x1="50" y1="82" x2="110" y2="82" stroke="#c8a060" stroke-width="0.5" opacity="0.35"/><text x="80" y="93" text-anchor="middle" font-size="4.5" fill="#c8a060" opacity="0.65" letter-spacing="1.5" font-family="sans-serif">SABTU, 20 JUNI 2026</text><rect x="22" y="100" width="116" height="16" rx="2" fill="#c8a060" opacity="0.07"/><rect x="22" y="100" width="116" height="16" rx="2" stroke="#c8a060" stroke-width="0.4" fill="none" opacity="0.18"/><text x="80" y="110.5" text-anchor="middle" font-size="5" fill="#f0e0c0" opacity="0.45" font-family="sans-serif">&#9962; Pemberkatan  &amp;  &#127818; Resepsi</text><text x="80" y="125" text-anchor="middle" font-size="5" fill="#c8a060" opacity="0.3" letter-spacing="3" font-family="sans-serif">&#10022; &#10022; &#10022;</text></svg>
+              <div class="theme-check">&#10003;</div>
+            </div>
+            <div class="theme-label">🌸 Taman Rahasia<br><span class="theme-mood-tag">Hangat seperti rumah, indah seperti bunga</span></div>
+          </div>
+          <div class="theme-card" onclick="setTheme('darkromance',this)">
+            <div class="theme-thumb tt-darkromance">
+              <svg width="160" height="130" viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><defs><linearGradient id="gadrian" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2e0d1c"/><stop offset="100%" stop-color="#0f0810"/></linearGradient></defs><rect width="160" height="130" fill="url(#gadrian)"/><text x="80" y="20" text-anchor="middle" font-size="5" fill="#e06080" opacity="0.6" letter-spacing="2" font-family="sans-serif">THE WEDDING OF</text><text x="80" y="40" text-anchor="middle" font-size="14" fill="#fce8ee" font-family="Georgia,serif" font-weight="300">Adrian</text><text x="80" y="54" text-anchor="middle" font-size="10" fill="#e06080" font-family="Georgia,serif" font-style="italic">&amp;</text><text x="80" y="72" text-anchor="middle" font-size="14" fill="#fce8ee" font-family="Georgia,serif" font-weight="300">Celine</text><line x1="50" y1="82" x2="110" y2="82" stroke="#e06080" stroke-width="0.5" opacity="0.35"/><text x="80" y="93" text-anchor="middle" font-size="4.5" fill="#e06080" opacity="0.65" letter-spacing="1.5" font-family="sans-serif">SABTU, 20 JUNI 2026</text><rect x="22" y="100" width="116" height="16" rx="2" fill="#e06080" opacity="0.07"/><rect x="22" y="100" width="116" height="16" rx="2" stroke="#e06080" stroke-width="0.4" fill="none" opacity="0.18"/><text x="80" y="110.5" text-anchor="middle" font-size="5" fill="#fce8ee" opacity="0.45" font-family="sans-serif">&#9962; Pemberkatan  &amp;  &#127818; Resepsi</text><text x="80" y="125" text-anchor="middle" font-size="5" fill="#e06080" opacity="0.3" letter-spacing="3" font-family="sans-serif">&#10022; &#10022; &#10022;</text></svg>
+              <div class="theme-check">&#10003;</div>
+            </div>
+            <div class="theme-label">♡ Malam Pertama<br><span class="theme-mood-tag">Intens, dalam, tak terlupakan</span></div>
+          </div>
+          <div class="theme-card" onclick="setTheme('y2k',this)">
+            <div class="theme-thumb tt-y2k">
+              <svg width="160" height="130" viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><defs><linearGradient id="gkevin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1428"/><stop offset="100%" stop-color="#08101e"/></linearGradient></defs><rect width="160" height="130" fill="url(#gkevin)"/><text x="80" y="20" text-anchor="middle" font-size="5" fill="#60b0ff" opacity="0.6" letter-spacing="2" font-family="sans-serif">THE WEDDING OF</text><text x="80" y="40" text-anchor="middle" font-size="14" fill="#e0f0ff" font-family="Georgia,serif" font-weight="300">Kevin</text><text x="80" y="54" text-anchor="middle" font-size="10" fill="#60b0ff" font-family="Georgia,serif" font-style="italic">&amp;</text><text x="80" y="72" text-anchor="middle" font-size="14" fill="#e0f0ff" font-family="Georgia,serif" font-weight="300">Jessica</text><line x1="50" y1="82" x2="110" y2="82" stroke="#60b0ff" stroke-width="0.5" opacity="0.35"/><text x="80" y="93" text-anchor="middle" font-size="4.5" fill="#60b0ff" opacity="0.65" letter-spacing="1.5" font-family="sans-serif">SABTU, 20 JUNI 2026</text><rect x="22" y="100" width="116" height="16" rx="2" fill="#60b0ff" opacity="0.07"/><rect x="22" y="100" width="116" height="16" rx="2" stroke="#60b0ff" stroke-width="0.4" fill="none" opacity="0.18"/><text x="80" y="110.5" text-anchor="middle" font-size="5" fill="#e0f0ff" opacity="0.45" font-family="sans-serif">&#9962; Pemberkatan  &amp;  &#127818; Resepsi</text><text x="80" y="125" text-anchor="middle" font-size="5" fill="#60b0ff" opacity="0.3" letter-spacing="3" font-family="sans-serif">&#10022; &#10022; &#10022;</text></svg>
+              <div class="theme-check">&#10003;</div>
+            </div>
+            <div class="theme-label">◈ Cahaya Kota<br><span class="theme-mood-tag">Modern, berani, penuh cahaya</span></div>
+          </div>
+          <div class="theme-card" onclick="setTheme('bali',this)">
+            <div class="theme-thumb tt-bali">
+              <svg width="160" height="130" viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><defs><linearGradient id="gdewa" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#102010"/><stop offset="100%" stop-color="#091408"/></linearGradient></defs><rect width="160" height="130" fill="url(#gdewa)"/><text x="80" y="20" text-anchor="middle" font-size="5" fill="#70c068" opacity="0.6" letter-spacing="2" font-family="sans-serif">THE WEDDING OF</text><text x="80" y="40" text-anchor="middle" font-size="14" fill="#e8f8e0" font-family="Georgia,serif" font-weight="300">Dewa</text><text x="80" y="54" text-anchor="middle" font-size="10" fill="#60b058" font-family="Georgia,serif" font-style="italic">&amp;</text><text x="80" y="72" text-anchor="middle" font-size="14" fill="#e8f8e0" font-family="Georgia,serif" font-weight="300">Ayu</text><line x1="50" y1="82" x2="110" y2="82" stroke="#70c068" stroke-width="0.5" opacity="0.35"/><text x="80" y="93" text-anchor="middle" font-size="4.5" fill="#70c068" opacity="0.65" letter-spacing="1.5" font-family="sans-serif">SABTU, 20 JUNI 2026</text><rect x="22" y="100" width="116" height="16" rx="2" fill="#70c068" opacity="0.07"/><rect x="22" y="100" width="116" height="16" rx="2" stroke="#70c068" stroke-width="0.4" fill="none" opacity="0.18"/><text x="80" y="110.5" text-anchor="middle" font-size="5" fill="#e8f8e0" opacity="0.45" font-family="sans-serif">&#9962; Pemberkatan  &amp;  &#127818; Resepsi</text><text x="80" y="125" text-anchor="middle" font-size="5" fill="#70c068" opacity="0.3" letter-spacing="3" font-family="sans-serif">&#10022; &#10022; &#10022;</text></svg>
+              <div class="theme-check">&#10003;</div>
+            </div>
+            <div class="theme-label">🌿 Surga Hijau<br><span class="theme-mood-tag">Kesegaran alam di hari terpenting</span></div>
+          </div>
+          <div class="theme-card" onclick="setTheme('minimalist',this)">
+            <div class="theme-thumb tt-minimalist">
+              <svg width="160" height="130" viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><defs><linearGradient id="gjames" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#eeede8"/><stop offset="100%" stop-color="#f5f4f0"/></linearGradient></defs><rect width="160" height="130" fill="url(#gjames)"/><text x="80" y="20" text-anchor="middle" font-size="5" fill="#8a8878" opacity="0.6" letter-spacing="2" font-family="sans-serif">THE WEDDING OF</text><text x="80" y="40" text-anchor="middle" font-size="14" fill="#1a1a18" font-family="Georgia,serif" font-weight="300">James</text><text x="80" y="54" text-anchor="middle" font-size="10" fill="#bab8b0" font-family="Georgia,serif" font-style="italic">&amp;</text><text x="80" y="72" text-anchor="middle" font-size="14" fill="#1a1a18" font-family="Georgia,serif" font-weight="300">Sarah</text><line x1="50" y1="82" x2="110" y2="82" stroke="#8a8878" stroke-width="0.5" opacity="0.35"/><text x="80" y="93" text-anchor="middle" font-size="4.5" fill="#8a8878" opacity="0.65" letter-spacing="1.5" font-family="sans-serif">SABTU, 20 JUNI 2026</text><rect x="22" y="100" width="116" height="16" rx="2" fill="#8a8878" opacity="0.07"/><rect x="22" y="100" width="116" height="16" rx="2" stroke="#8a8878" stroke-width="0.4" fill="none" opacity="0.18"/><text x="80" y="110.5" text-anchor="middle" font-size="5" fill="#1a1a18" opacity="0.45" font-family="sans-serif">&#9962; Pemberkatan  &amp;  &#127818; Resepsi</text><text x="80" y="125" text-anchor="middle" font-size="5" fill="#8a8878" opacity="0.3" letter-spacing="3" font-family="sans-serif">&#10022; &#10022; &#10022;</text></svg>
+              <div class="theme-check">&#10003;</div>
+            </div>
+            <div class="theme-label" style="background:#eae9e4;color:#888;border-top:1px solid #ddd">— Bisikan Putih<br><span class="theme-mood-tag">Keindahan sejati tak perlu kata-kata</span></div>
+          </div>
+          <div class="theme-card" onclick="setTheme('vintage',this)">
+            <div class="theme-thumb tt-vintage">
+              <svg width="160" height="130" viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><defs><linearGradient id="gthomas" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#241408"/><stop offset="100%" stop-color="#160e08"/></linearGradient></defs><rect width="160" height="130" fill="url(#gthomas)"/><text x="80" y="20" text-anchor="middle" font-size="5" fill="#c8a050" opacity="0.6" letter-spacing="2" font-family="sans-serif">THE WEDDING OF</text><text x="80" y="40" text-anchor="middle" font-size="14" fill="#f0e0b0" font-family="Georgia,serif" font-weight="300">Thomas</text><text x="80" y="54" text-anchor="middle" font-size="10" fill="#c8a050" font-family="Georgia,serif" font-style="italic">&amp;</text><text x="80" y="72" text-anchor="middle" font-size="14" fill="#f0e0b0" font-family="Georgia,serif" font-weight="300">Eleanor</text><line x1="50" y1="82" x2="110" y2="82" stroke="#c8a050" stroke-width="0.5" opacity="0.35"/><text x="80" y="93" text-anchor="middle" font-size="4.5" fill="#c8a050" opacity="0.65" letter-spacing="1.5" font-family="sans-serif">SABTU, 20 JUNI 2026</text><rect x="22" y="100" width="116" height="16" rx="2" fill="#c8a050" opacity="0.07"/><rect x="22" y="100" width="116" height="16" rx="2" stroke="#c8a050" stroke-width="0.4" fill="none" opacity="0.18"/><text x="80" y="110.5" text-anchor="middle" font-size="5" fill="#f0e0b0" opacity="0.45" font-family="sans-serif">&#9962; Pemberkatan  &amp;  &#127818; Resepsi</text><text x="80" y="125" text-anchor="middle" font-size="5" fill="#c8a050" opacity="0.3" letter-spacing="3" font-family="sans-serif">&#10022; &#10022; &#10022;</text></svg>
+              <div class="theme-check">&#10003;</div>
+            </div>
+            <div class="theme-label">❧ Warisan Cinta<br><span class="theme-mood-tag">Cerita yang dikenang selamanya</span></div>
+          </div>
+          <div class="theme-card" onclick="setTheme('celestial',this)">
+            <div class="theme-thumb tt-celestial">
+              <svg width="160" height="130" viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><defs><linearGradient id="glangit" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#12183a"/><stop offset="100%" stop-color="#070918"/></linearGradient></defs><rect width="160" height="130" fill="url(#glangit)"/><text x="80" y="20" text-anchor="middle" font-size="5" fill="#8090d0" opacity="0.6" letter-spacing="2" font-family="sans-serif">THE WEDDING OF</text><text x="80" y="40" text-anchor="middle" font-size="14" fill="#e0e8ff" font-family="Georgia,serif" font-weight="300">Langit</text><text x="80" y="54" text-anchor="middle" font-size="10" fill="#8090d0" font-family="Georgia,serif" font-style="italic">&amp;</text><text x="80" y="72" text-anchor="middle" font-size="14" fill="#e0e8ff" font-family="Georgia,serif" font-weight="300">Bintari</text><line x1="50" y1="82" x2="110" y2="82" stroke="#8090d0" stroke-width="0.5" opacity="0.35"/><text x="80" y="93" text-anchor="middle" font-size="4.5" fill="#8090d0" opacity="0.65" letter-spacing="1.5" font-family="sans-serif">SABTU, 20 JUNI 2026</text><rect x="22" y="100" width="116" height="16" rx="2" fill="#8090d0" opacity="0.07"/><rect x="22" y="100" width="116" height="16" rx="2" stroke="#8090d0" stroke-width="0.4" fill="none" opacity="0.18"/><text x="80" y="110.5" text-anchor="middle" font-size="5" fill="#e0e8ff" opacity="0.45" font-family="sans-serif">&#9962; Pemberkatan  &amp;  &#127818; Resepsi</text><text x="80" y="125" text-anchor="middle" font-size="5" fill="#8090d0" opacity="0.3" letter-spacing="3" font-family="sans-serif">&#10022; &#10022; &#10022;</text></svg>
+              <div class="theme-check">&#10003;</div>
+            </div>
+            <div class="theme-label">✦ Langit Malam<br><span class="theme-mood-tag">Di bawah bintang, kita bersatu</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: COUPLE -->
+      <div class="step-panel" id="panel2">
+        <div class="sec-title">Mempelai Pria</div>
+        <div class="step-mood">Nama kalian akan tercetak dalam kenangan tamu selamanya.</div>
+        <div class="field">
+          <label class="field-label">Nama Lengkap</label>
+          <input class="field-input" id="groomName" placeholder="cth. Budi Santoso" oninput="render()">
+        </div>
+        <div class="field">
+          <label class="field-label">Panggilan</label>
+          <input class="field-input" id="groomNick" placeholder="cth. Budi" oninput="render()">
+        </div>
+        <div class="field">
+          <label class="field-label">Nama Ayah</label>
+          <input class="field-input" id="groomDad" placeholder="cth. Bpk. Hendra Santoso" oninput="render()">
+        </div>
+        <div class="field">
+          <label class="field-label">Nama Ibu</label>
+          <input class="field-input" id="groomMom" placeholder="cth. Ibu Sri Wahyuni" oninput="render()">
+        </div>
+        <div class="field">
+          <label class="field-label">Foto Mempelai Pria</label>
+          <div class="upload-area">
+            <input type="file" accept="image/*" onchange="uploadPhoto(this,'groomPhoto')">
+            <div class="upload-icon">📷</div>
+            <div class="upload-text"><strong>Klik untuk upload</strong>JPG/PNG, maks 5MB</div>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div class="sec-title">Mempelai Wanita</div>
+        <div class="field">
+          <label class="field-label">Nama Lengkap</label>
+          <input class="field-input" id="brideName" placeholder="cth. Sari Dewi" oninput="render()">
+        </div>
+        <div class="field">
+          <label class="field-label">Panggilan</label>
+          <input class="field-input" id="brideNick" placeholder="cth. Sari" oninput="render()">
+        </div>
+        <div class="field">
+          <label class="field-label">Nama Ayah</label>
+          <input class="field-input" id="brideDad" placeholder="cth. Bpk. Yusuf Rahman" oninput="render()">
+        </div>
+        <div class="field">
+          <label class="field-label">Nama Ibu</label>
+          <input class="field-input" id="brideMom" placeholder="cth. Ibu Fatimah" oninput="render()">
+        </div>
+        <div class="field">
+          <label class="field-label">Foto Mempelai Wanita</label>
+          <div class="upload-area">
+            <input type="file" accept="image/*" onchange="uploadPhoto(this,'bridePhoto')">
+            <div class="upload-icon">📷</div>
+            <div class="upload-text"><strong>Klik untuk upload</strong>JPG/PNG, maks 5MB</div>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div class="sec-title">Ayat / Kutipan</div>
+        <div class="field">
+          <textarea class="field-textarea" id="verse" oninput="render()" placeholder="Ayat firman atau kutipan favorit kalian...">"Demikianlah mereka bukan lagi dua, melainkan satu."</textarea>
+        </div>
+        <div class="field">
+          <input class="field-input" id="verseRef" oninput="render()" placeholder="Referensi — cth. Matius 19:6">
+        </div>
+      </div>
+
+      <!-- STEP 3: EVENT -->
+      <div class="step-panel" id="panel3">
+        <div class="sec-title">Pemberkatan / Akad</div>
+        <div class="step-mood">Tamu akan menandai tanggal ini di kalender mereka dengan senyum.</div>
+        <div class="field">
+          <label class="field-label">Tanggal</label>
+          <input class="field-input" type="date" id="ceremonyDate" oninput="render()">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Pukul</label>
+            <input class="field-input" type="time" id="ceremonyTime" oninput="render()">
+          </div>
+          <div class="field">
+            <label class="field-label">Zona Waktu</label>
+            <select class="field-select" id="ceremonyTZ" onchange="render()">
+              <option>WIB</option><option>WITA</option><option>WIT</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Nama Tempat</label>
+          <input class="field-input" id="ceremonyVenueName" placeholder="cth. Gereja Katedral Jakarta" oninput="render()">
+        </div>
+        <div class="field">
+          <label class="field-label">Alamat</label>
+          <textarea class="field-textarea" id="ceremonyAddr" placeholder="Alamat lengkap tempat ibadah" oninput="render()"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label">Link Google Maps</label>
+          <input class="field-input" id="ceremonyMaps" placeholder="https://maps.app.goo.gl/..." oninput="render()">
+        </div>
+        <div class="sep"></div>
+        <div class="sec-title">Resepsi</div>
+        <div class="field">
+          <label class="field-label">Tanggal</label>
+          <input class="field-input" type="date" id="receptionDate" oninput="render()">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Pukul</label>
+            <input class="field-input" type="time" id="receptionTime" oninput="render()">
+          </div>
+          <div class="field">
+            <label class="field-label">Zona Waktu</label>
+            <select class="field-select" id="receptionTZ" onchange="render()">
+              <option>WIB</option><option selected>WITA</option><option>WIT</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Nama Gedung</label>
+          <input class="field-input" id="receptionVenueName" placeholder="cth. Bali Nusa Dua Convention Centre" oninput="render()">
+        </div>
+        <div class="field">
+          <label class="field-label">Alamat</label>
+          <textarea class="field-textarea" id="receptionAddr" placeholder="Alamat lengkap gedung resepsi" oninput="render()"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label">Link Google Maps</label>
+          <input class="field-input" id="receptionMaps" placeholder="https://maps.app.goo.gl/..." oninput="render()">
+        </div>
+      </div>
+
+      <!-- STEP 4: FEATURES -->
+      <div class="step-panel" id="panel4">
+        <div class="sec-title">Sentuhan Terakhir</div>
+        <div class="step-mood">Detail kecil yang membuat perbedaan besar bagi setiap tamu.</div>
+        <div class="toggle-row">
+          <span class="toggle-label">⏱ Countdown Timer</span>
+          <div class="toggle on" id="tog-countdown" onclick="togFeature('countdown',this)"></div>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">📸 Galeri Foto</span>
+          <div class="toggle on" id="tog-gallery" onclick="togFeature('gallery',this)"></div>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">✉️ Form RSVP</span>
+          <div class="toggle on" id="tog-rsvp" onclick="togFeature('rsvp',this)"></div>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">💌 Feed Ucapan</span>
+          <div class="toggle on" id="tog-wishes" onclick="togFeature('wishes',this)"></div>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">🎵 Musik Latar</span>
+          <div class="toggle" id="tog-music" onclick="togFeature('music',this)"></div>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">🗺 Google Maps</span>
+          <div class="toggle on" id="tog-maps" onclick="togFeature('maps',this)"></div>
+        </div>
+        <div class="sep"></div>
+        <div class="sec-title">Nama Tamu (Personalisasi)</div>
+        <div class="field">
+          <input class="field-input" id="guestName" placeholder="cth. Keluarga Bapak Herry" oninput="render()">
+          <div class="field-hint">Nama ini muncul di cover undangan sebagai sapaan personal.</div>
+        </div>
+        <div class="sep"></div>
+        <div class="sec-title">Love Story</div>
+        <div class="field">
+          <label class="field-label">Judul 1</label>
+          <input class="field-input" id="s1title" value="Pertemuan" oninput="render()">
+        </div>
+        <div class="field">
+          <label class="field-label">Cerita 1</label>
+          <textarea class="field-textarea" id="s1text" oninput="render()" placeholder="Ceritakan pertemuan pertama kalian..."></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label">Judul 2</label>
+          <input class="field-input" id="s2title" value="Jatuh Cinta" oninput="render()">
+        </div>
+        <div class="field">
+          <label class="field-label">Cerita 2</label>
+          <textarea class="field-textarea" id="s2text" oninput="render()" placeholder="Momen yang membuat kalian yakin..."></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label">Judul 3</label>
+          <input class="field-input" id="s3title" value="Menikah" oninput="render()">
+        </div>
+        <div class="field">
+          <label class="field-label">Cerita 3</label>
+          <textarea class="field-textarea" id="s3text" oninput="render()" placeholder="Kini saatnya mengikat janji selamanya..."></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 5: DONE -->
+      <div class="step-panel" id="panel5">
+        <div style="text-align:center;padding:20px 0;">
+          <div style="font-size:48px;margin-bottom:16px;">💌</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:26px;font-style:italic;color:var(--text);margin-bottom:8px;">Kisah kalian siap.</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:24px;font-style:italic;">Undangan kalian sudah bisa dilihat seperti tamu menerimanya. Download dan sebarkan cinta kalian.</div>
+        </div>
+        <button class="btn-next" onclick="downloadHTML()" style="margin-bottom:10px;">⬇ Download Undangan</button>
+        <button class="btn-back" onclick="copyShareLink()">⎘ Salin Link Share</button>
+        <div class="sep"></div>
+        <div class="sec-title">Ringkasan</div>
+        <div style="font-size:12px;color:var(--muted);line-height:2;" id="summary-box">—</div>
+      </div>
+
+    </div><!-- /panel-body -->
+
+    <!-- PANEL FOOTER (nav buttons) -->
+    <div class="panel-footer" id="panel-footer">
+      <button class="btn-back" id="btn-back" onclick="prevStep()" style="display:none">← Kembali</button>
+      <button class="btn-next" id="btn-next" onclick="nextStep()">Lanjut →</button>
+    </div>
+  </div><!-- /left-panel -->
+
+  <!-- PREVIEW -->
+  <div class="preview-area">
+    <div class="preview-bar">
+      <span class="preview-bar-label" id="preview-bar-label">📱 Preview Undangan</span>
+      <div class="preview-zoom">
+        <button class="zoom-btn" onclick="setZoom(0.8)" title="Zoom out">−</button>
+        <button class="zoom-btn" onclick="setZoom(1)" title="Reset">↺</button>
+        <button class="zoom-btn" onclick="setZoom(1.1)" title="Zoom in">+</button>
+      </div>
+    </div>
+    <div class="preview-scroll">
+      <div class="device" id="device">
+        <div class="device-notch"></div>
+        <iframe id="screen" style="width:100%;height:820px;border:none;display:block;padding-top:22px;" scrolling="yes"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="rp-title">Navigasi Cepat</div>
+    <button class="quick-btn active" onclick="scrollTo_('#inv-cover-section')"><span class="qi">🖼</span>Cover</button>
+    <button class="quick-btn" onclick="scrollTo_('#inv-couple-section')"><span class="qi">👫</span>Pasangan</button>
+    <button class="quick-btn" onclick="scrollTo_('#inv-event-section')"><span class="qi">📅</span>Jadwal</button>
+    <button class="quick-btn" onclick="scrollTo_('#inv-countdown-section')"><span class="qi">⏱</span>Countdown</button>
+    <button class="quick-btn" onclick="scrollTo_('#inv-gallery-section')"><span class="qi">📸</span>Galeri</button>
+    <button class="quick-btn" onclick="scrollTo_('#inv-rsvp-section')"><span class="qi">✉️</span>RSVP</button>
+    <button class="quick-btn" onclick="scrollTo_('#inv-wishes-section')"><span class="qi">💌</span>Ucapan</button>
+
+    <div class="rp-sep"></div>
+    <div class="rp-title">Tema Aktif</div>
+    <div class="rp-stat"><div class="rp-stat-label">Tema</div><div class="rp-stat-val" id="rp-theme">Aesthetic</div></div>
+    <div class="rp-stat"><div class="rp-stat-label">Pasangan</div><div class="rp-stat-val" id="rp-couple">— & —</div></div>
+    <div class="rp-stat"><div class="rp-stat-label">Resepsi</div><div class="rp-stat-val" id="rp-date">Belum diisi</div></div>
+
+    <div class="rp-sep"></div>
+    <div class="rp-title">Sebarkan</div>
+    <div class="share-box">
+      <div class="share-url">invitely.id/preview/my-wedding</div>
+      <button class="copy-btn" onclick="copyShareLink()">Salin Link</button>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- GUEST MODE OVERLAY -->
+<div class="guest-mode-overlay" id="guestOverlay">
+  <iframe class="guest-iframe" id="guestIframe"></iframe>
+  <button class="guest-close" onclick="closeGuestMode()">✕ Kembali ke Editor</button>
+</div>
+
+<script>
+// ── STATE ──
+var state = {
+  theme: 'aesthetic',
+  features: { countdown:true, gallery:true, rsvp:true, wishes:true, music:false, maps:true },
+  step: 1,
+  photos: { groomPhoto: null, bridePhoto: null },
+  _cdInterval: null,
+  _renderDebounce: null,
+  _lastTheme: null
+};
+
+var themeNames = {
+  aesthetic:'Aesthetic',cottagecore:'Cottagecore',darkromance:'Dark Romance',
+  y2k:'Y2K',bali:'Bali Garden',minimalist:'Minimalist',vintage:'Vintage Gold',celestial:'Celestial'
+};
+
+var themeOrns = {
+  aesthetic:'✦  ✦  ✦', cottagecore:'❧  ❧  ❧', darkromance:'♡  ♡  ♡',
+  y2k:'◈  ◈  ◈', bali:'⸙  ⸙  ⸙', minimalist:'—  —  —',
+  vintage:'✦  ✦  ✦', celestial:'✦  ✦  ✦'
+};
+
+// ── THEME ──
+function setTheme(t, el) {
+  state.theme = t;
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('rp-theme').textContent = themeNames[t];
+  render();
+}
+
+// ── STEPS ──
+function goStep(n) {
+  state.step = n;
+  for (var i = 1; i <= 5; i++) {
+    var tab = document.getElementById('tab' + i);
+    var panel = document.getElementById('panel' + i);
+    tab.className = 'step-tab' + (i === n ? ' active' : (i < n ? ' done' : ''));
+    panel.className = 'step-panel' + (i === n ? ' active' : '');
+  }
+  document.getElementById('btn-back').style.display = n > 1 ? 'block' : 'none';
+  document.getElementById('btn-next').textContent = n < 5 ? 'Lanjut →' : 'Download';
+  document.getElementById('btn-next').onclick = n < 5 ? nextStep : downloadHTML;
+  if (n === 5) updateSummary();
+  render();
+}
+
+function nextStep() { if (state.step < 5) goStep(state.step + 1); }
+function prevStep() { if (state.step > 1) goStep(state.step - 1); }
+
+// ── FEATURES ──
+function togFeature(key, el) {
+  state.features[key] = !state.features[key];
+  el.classList.toggle('on', state.features[key]);
+  render();
+}
+
+// ── HELPERS ──
+function v(id, fb) {
+  var el = document.getElementById(id);
+  return el && el.value.trim() ? el.value.trim() : (fb || '');
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr) return '';
+  var d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+
+function fmtTime(t) {
+  if (!t) return '';
+  return 'Pukul ' + t.replace(':', '.') + ' ';
+}
+
+function uploadPhoto(input, key) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) { state.photos[key] = e.target.result; render(); };
+  reader.readAsDataURL(file);
+}
+
+function setZoom(z) {
+  var d = document.getElementById('device');
+  d.style.transform = 'scale(' + z + ')';
+  d.style.transformOrigin = 'top center';
+}
+
+// ── RENDER (debounced) ──
+function render() {
+  clearTimeout(state._renderDebounce);
+  state._renderDebounce = setTimeout(_doRender, 80);
+}
+
+function _doRender() {
+  var t = state.theme;
+  var groom = v('groomName','Nama Pria');
+  var bride = v('brideName','Nama Wanita');
+  var groomNick = v('groomNick', groom.split(' ')[0]);
+  var brideNick = v('brideNick', bride.split(' ')[0]);
+  var groomDad = v('groomDad','Bpk. Nama Ayah'); var groomMom = v('groomMom','Ibu Nama Ibu');
+  var brideDad = v('brideDad','Bpk. Nama Ayah'); var brideMom = v('brideMom','Ibu Nama Ibu');
+  var verse = v('verse','"Karena itu, apa yang telah dipersatukan Allah, tidak boleh diceraikan manusia."');
+  var verseRef = v('verseRef','Matius 19:6');
+  var guest = v('guestName','Tamu Undangan');
+  var orn = themeOrns[t];
+
+  var cDate = fmtDate(v('ceremonyDate')); var cTime = fmtTime(v('ceremonyTime')); var cTZ = v('ceremonyTZ','WIB');
+  var cVenue = v('ceremonyVenueName','Nama Tempat Ibadah'); var cAddr = v('ceremonyAddr','Alamat tempat ibadah');
+  var cMaps = v('ceremonyMaps','#');
+
+  var rDate = fmtDate(v('receptionDate')); var rTime = fmtTime(v('receptionTime')); var rTZ = v('receptionTZ','WITA');
+  var rVenue = v('receptionVenueName','Nama Gedung Resepsi'); var rAddr = v('receptionAddr','Alamat gedung resepsi');
+  var rMaps = v('receptionMaps','#');
+
+  // right panel
+  document.getElementById('rp-couple').textContent = groomNick + ' & ' + brideNick;
+  document.getElementById('rp-date').textContent = rDate || 'Belum diisi';
+
+  // build countdown numbers (static snapshot — iframe ticks itself)
+  function cdNums() {
+    var rdStr = v('receptionDate'), rt = v('receptionTime','18:00');
+    if (!rdStr) return null;
+    var diff = new Date(rdStr + 'T' + rt) - new Date();
+    if (diff < 0) diff = 0;
+    return {
+      d: Math.floor(diff/86400000),
+      h: Math.floor((diff%86400000)/3600000),
+      m: Math.floor((diff%3600000)/60000),
+      s: Math.floor((diff%60000)/1000)
+    };
+  }
+  var cd = cdNums();
+
+  var photoG = state.photos.groomPhoto ? '<img src="'+state.photos.groomPhoto+'" style="width:72px;height:90px;object-fit:cover;margin:0 auto 8px;display:block;border-radius:2px;">' : '<div style="width:72px;height:90px;margin:0 auto 8px;border:1px dashed currentColor;opacity:0.25;display:flex;align-items:center;justify-content:center;font-size:8px;text-transform:uppercase;letter-spacing:1px">foto</div>';
+  var photoB = state.photos.bridePhoto ? '<img src="'+state.photos.bridePhoto+'" style="width:72px;height:90px;object-fit:cover;margin:0 auto 8px;display:block;border-radius:2px;">' : '<div style="width:72px;height:90px;margin:0 auto 8px;border:1px dashed currentColor;opacity:0.25;display:flex;align-items:center;justify-content:center;font-size:8px;text-transform:uppercase;letter-spacing:1px">foto</div>';
+
+  var themeChanged = (state._lastTheme !== t);
+  state._lastTheme = t;
+
+  // ── THEME CONFIG ──
+  var TH = {
+    aesthetic: {
+      bg:'#110d1a', cover:'radial-gradient(ellipse at 50% 0%,#2d1f40 0%,#110d1a 65%)',
+      accent:'#b47eff', accentDim:'rgba(180,126,255,0.12)', accentBorder:'rgba(180,126,255,0.2)',
+      text:'#e8d4f8', name:'#f0e4ff', footer:'#0e0a18',
+      nameFont:"'Syne',sans-serif", nameFontWeight:'700', nameFontSize:'30px', nameLetterSpacing:'-1px', nameTransform:'none',
+      bodyFont:"'DM Sans',sans-serif", preFont:"'Syne',sans-serif",
+      orn:'✦  ✦  ✦',
+      particles: ['✦','✧','⋆','·'],
+      particleAnim: 'float-sparkle'
+    },
+    cottagecore: {
+      bg:'#1a160c', cover:'linear-gradient(180deg,#2a2010,#1a160c)',
+      accent:'#c8a060', accentDim:'rgba(160,120,60,0.1)', accentBorder:'rgba(160,120,60,0.22)',
+      text:'#e8d8b0', name:'#f0e0c0', footer:'#14100a',
+      nameFont:"'Cormorant Garamond',serif", nameFontWeight:'300', nameFontSize:'38px', nameLetterSpacing:'0', nameTransform:'none',
+      bodyFont:"'Cormorant Garamond',serif", preFont:"'Josefin Sans',sans-serif",
+      orn:'❧  ❧  ❧',
+      particles: ['🌸','·','❧','✿'],
+      particleAnim: 'float-petal'
+    },
+    darkromance: {
+      bg:'#0f0810', cover:'radial-gradient(ellipse at 50% 0%,#2e0d1c 0%,#0f0810 70%)',
+      accent:'#e06080', accentDim:'rgba(200,60,90,0.08)', accentBorder:'rgba(200,60,90,0.2)',
+      text:'#f0d0da', name:'#fce8ee', footer:'#0a0510',
+      nameFont:"'Playfair Display',serif", nameFontWeight:'400', nameFontSize:'34px', nameLetterSpacing:'0', nameTransform:'none',
+      bodyFont:"'Cormorant Garamond',serif", preFont:"'Josefin Sans',sans-serif",
+      orn:'♡  ♡  ♡',
+      particles: ['♡','·','✦','♥'],
+      particleAnim: 'float-heart'
+    },
+    y2k: {
+      bg:'#08101e', cover:'linear-gradient(160deg,#0a1428,#081018)',
+      accent:'#60b0ff', accentDim:'rgba(96,176,255,0.07)', accentBorder:'rgba(96,176,255,0.18)',
+      text:'#c0e0ff', name:'#e0f0ff', footer:'#060c18',
+      nameFont:"'Syne',sans-serif", nameFontWeight:'800', nameFontSize:'26px', nameLetterSpacing:'-1px', nameTransform:'uppercase',
+      bodyFont:"'DM Sans',sans-serif", preFont:"'Syne',sans-serif",
+      orn:'◈  ◈  ◈',
+      particles: ['◈','◇','·','○'],
+      particleAnim: 'float-chrome'
+    },
+    bali: {
+      bg:'#091408', cover:'linear-gradient(180deg,#102010,#091408)',
+      accent:'#70c068', accentDim:'rgba(80,168,72,0.08)', accentBorder:'rgba(80,168,72,0.2)',
+      text:'#d0eec8', name:'#e8f8e0', footer:'#060e05',
+      nameFont:"'Dancing Script',cursive", nameFontWeight:'500', nameFontSize:'40px', nameLetterSpacing:'0', nameTransform:'none',
+      bodyFont:"'Cormorant Garamond',serif", preFont:"'Josefin Sans',sans-serif",
+      orn:'⸙  ⸙  ⸙',
+      particles: ['🌿','·','❧','⸙'],
+      particleAnim: 'float-leaf'
+    },
+    minimalist: {
+      bg:'#f5f4f0', cover:'#eeede8',
+      accent:'#8a8878', accentDim:'rgba(0,0,0,0.04)', accentBorder:'rgba(0,0,0,0.1)',
+      text:'#2a2820', name:'#1a1a18', footer:'#eeede8',
+      nameFont:"'Syne',sans-serif", nameFontWeight:'700', nameFontSize:'24px', nameLetterSpacing:'-0.5px', nameTransform:'uppercase',
+      bodyFont:"'DM Sans',sans-serif", preFont:"'Syne',sans-serif",
+      orn:'—  —  —',
+      particles: ['·','—','·','—'],
+      particleAnim: 'float-minimal'
+    },
+    vintage: {
+      bg:'#160e08', cover:'linear-gradient(180deg,#241408,#160e08)',
+      accent:'#c8a050', accentDim:'rgba(180,130,50,0.09)', accentBorder:'rgba(180,130,50,0.22)',
+      text:'#e8d0a0', name:'#f0e0b0', footer:'#100a04',
+      nameFont:"'Cinzel',serif", nameFontWeight:'400', nameFontSize:'24px', nameLetterSpacing:'2px', nameTransform:'none',
+      bodyFont:"'Cormorant Garamond',serif", preFont:"'Cinzel',serif",
+      orn:'✦  ✦  ✦',
+      particles: ['✦','❧','·','✿'],
+      particleAnim: 'float-vintage'
+    },
+    celestial: {
+      bg:'#070918', cover:'radial-gradient(ellipse at 50% 0%,#12183a 0%,#070918 70%)',
+      accent:'#8090d0', accentDim:'rgba(128,144,208,0.08)', accentBorder:'rgba(128,144,208,0.2)',
+      text:'#c8d0f0', name:'#e0e8ff', footer:'#040610',
+      nameFont:"'Cormorant Garamond',serif", nameFontWeight:'300', nameFontSize:'38px', nameLetterSpacing:'0', nameTransform:'none',
+      bodyFont:"'Cormorant Garamond',serif", preFont:"'Josefin Sans',sans-serif",
+      orn:'✦  ✦  ✦',
+      particles: ['✦','✧','⋆','☽'],
+      particleAnim: 'float-star'
+    }
+  };
+  var th = TH[t];
+
+  // ── PARTICLES for cover ──
+  function makeParticles(count) {
+    var html = '';
+    for (var i = 0; i < count; i++) {
+      var p = th.particles[i % th.particles.length];
+      var x = (Math.random()*80 + 10).toFixed(1);
+      var y = (Math.random()*80 + 5).toFixed(1);
+      var delay = (Math.random()*4).toFixed(2);
+      var dur = (3 + Math.random()*4).toFixed(2);
+      var size = (9 + Math.random()*10).toFixed(1);
+      html += '<span class="particle" style="left:'+x+'%;top:'+y+'%;font-size:'+size+'px;animation-delay:'+delay+'s;animation-duration:'+dur+'s">'+p+'</span>';
+    }
+    return html;
+  }
+
+  // ── SECTION LABEL ──
+  function secLabel(icon, text) {
+    return '<div class="sec-lbl"><span>'+icon+' '+text+'</span></div>';
+  }
+
+  // ── COUNTDOWN HTML ──
+  var cdHtml = '';
+  if (state.features.countdown) {
+    if (cd) {
+      cdHtml = '<section class="inv-section reveal" id="inv-countdown-section">'+secLabel('⏱','Hitung Mundur')+'<div class="countdown"><div class="cd-u"><span class="cd-n" id="cd-d">'+String(cd.d).padStart(2,'0')+'</span><span class="cd-l">Hari</span></div><div class="cd-sep">:</div><div class="cd-u"><span class="cd-n" id="cd-h">'+String(cd.h).padStart(2,'0')+'</span><span class="cd-l">Jam</span></div><div class="cd-sep">:</div><div class="cd-u"><span class="cd-n" id="cd-m">'+String(cd.m).padStart(2,'0')+'</span><span class="cd-l">Menit</span></div><div class="cd-sep">:</div><div class="cd-u"><span class="cd-n" id="cd-s">'+String(cd.s).padStart(2,'0')+'</span><span class="cd-l">Detik</span></div></div></section>';
+    } else {
+      cdHtml = '<section class="inv-section reveal" id="inv-countdown-section">'+secLabel('⏱','Hitung Mundur')+'<div style="text-align:center;opacity:0.3;font-size:12px;padding:12px">Isi tanggal resepsi untuk menampilkan countdown</div></section>';
+    }
+  }
+
+  // ── GALLERY HTML ──
+  var galHtml = '';
+  if (state.features.gallery) {
+    galHtml = '<section class="inv-section reveal" id="inv-gallery-section">'+secLabel('📸','Galeri Foto')+'<div class="gallery">'+[1,2,3,4,5,6].map(function(n){ return '<div class="gal-item" style="animation-delay:'+(n*0.08)+'s">📷</div>'; }).join('')+'</div></section>';
+  }
+
+  // ── RSVP HTML ──
+  var rsvpHtml = '';
+  if (state.features.rsvp) {
+    rsvpHtml = '<section class="inv-section reveal" id="inv-rsvp-section">'+secLabel('✉️','Konfirmasi Kehadiran')+'<div class="rsvp-form"><input class="rsvp-inp" placeholder="Nama lengkap Anda"><select class="rsvp-inp" style="cursor:pointer"><option value="">— Hadir / Tidak Hadir —</option><option>Hadir</option><option>Tidak Hadir</option></select><textarea class="rsvp-inp" style="height:60px;resize:none" placeholder="Ucapan & doa untuk mempelai..."></textarea><button class="rsvp-btn">Kirim →</button></div></section>';
+  }
+
+  // ── WISHES HTML ──
+  var wishHtml = '';
+  if (state.features.wishes) {
+    wishHtml = '<section class="inv-section reveal" id="inv-wishes-section">'+secLabel('💌','Ucapan & Doa')+'<div class="wishes">'+[
+      ['Selamat berbahagia! Semoga langgeng selamanya 🙏','Andi & Rina','0.05s'],
+      ['Happily ever after, kalian berdua ✨','Kevin Prasetyo','0.12s'],
+      ['God bless your marriage! So happy for you ❤️','Keluarga Bapak Joko','0.19s']
+    ].map(function(w){ return '<div class="wish-card reveal" style="animation-delay:'+w[2]+'"><div class="wish-msg">'+w[0]+'</div><div class="wish-name">'+w[1]+'</div></div>'; }).join('')+'</div></section>';
+  }
+
+  // ── LOVE STORY ──
+  var s1t = v('s1title','Pertemuan'); var s1x = v('s1text','Ceritakan pertemuan pertama kalian...');
+  var s2t = v('s2title','Jatuh Cinta'); var s2x = v('s2text','Momen yang membuat kalian yakin...');
+  var s3t = v('s3title','Menikah'); var s3x = v('s3text','Kini saatnya mengikat janji selamanya...');
+  var storyHtml = '<section class="inv-section reveal" id="inv-story-section">'+secLabel('❤️','Our Love Story')+'<div class="story">'+
+    ['<div class="story-item reveal" style="animation-delay:0.05s"><div class="story-title">'+s1t+'</div><div class="story-text">'+s1x+'</div></div>',
+     '<div class="story-item reveal" style="animation-delay:0.12s"><div class="story-title">'+s2t+'</div><div class="story-text">'+s2x+'</div></div>',
+     '<div class="story-item reveal" style="animation-delay:0.19s"><div class="story-title">'+s3t+'</div><div class="story-text">'+s3x+'</div></div>'
+    ].join('')+'</div></section>';
+
+  // ── MUSIC BAR ──
+  var songNames = {
+    aesthetic:'Purple Dream — Ambient',
+    cottagecore:'Morning Garden — Acoustic',
+    darkromance:'Passionate Strings — Orchestral',
+    y2k:'Dreamy Nights — Lofi',
+    bali:'Gamelan Senja — Tropical',
+    minimalist:'Silence & Piano — Minimal',
+    vintage:'Golden Age — Jazz Piano',
+    celestial:'Star Drift — Ethereal'
+  };
+  var musicHtml = '<div class="music-player" id="musicPlayer">' +
+    '<button class="mp-play" id="mpPlayBtn" onclick="toggleMusic()"><span id="mpIcon">▶</span></button>' +
+    '<div class="mp-bars" id="mpBars"><span></span><span></span><span></span><span></span></div>' +
+    '<span class="mp-title" id="mpTitle">' + (songNames[state.theme]||'Wedding Ambient') + '</span>' +
+    '<button class="mp-play" onclick="toggleMusic()" style="font-size:9px;letter-spacing:1px;width:auto;padding:0 8px;border-radius:2px;opacity:0.6" id="mpMuteBtn">Musik</button>' +
+  '</div>';
+
+  // ── GOOGLE FONTS string ──
+  var gfonts = "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@500;600&family=Cinzel:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Josefin+Sans:wght@300;400&display=swap";
+
+  var mapsLink = state.features.maps && cMaps !== '#' ? '<a href="'+cMaps+'" class="maps-btn">📍 Buka Google Maps</a>' : '';
+  var rMapsLink = state.features.maps && rMaps !== '#' ? '<a href="'+rMaps+'" class="maps-btn">📍 Buka Google Maps</a>' : '';
+
+  // ── OPENING SCREEN HTML ──
+  var openingBg = th.cover;
+  var openingAccent = th.accent;
+  var themeIcon = {aesthetic:'✦',cottagecore:'🌸',darkromance:'♡',y2k:'◈',bali:'🌿',minimalist:'—',vintage:'❧',celestial:'✦'}[t] || '✦';
+  var themeSong = {
+    aesthetic:'Enchanting purple dream, slow ambient synth',
+    cottagecore:'Soft acoustic guitar, morning birds',
+    darkromance:'Slow orchestral strings, passionate',
+    y2k:'Dreamy chillwave, 2000s nostalgic',
+    bali:'Gamelan ambient, tropical breeze',
+    minimalist:'Minimal piano, pure and clean',
+    vintage:'Old jazz piano, warm and timeless',
+    celestial:'Ethereal choir, floating stars'
+  }[t] || 'Ambient wedding music';
+
+  var openingScreen = (
+    '<canvas id="cvs"></canvas>' +
+    '<div class="opening-screen" id="openScreen">' +
+      '<div class="os-bg"></div>' +
+      '<div class="os-content">' +
+        '<div class="os-line-top"></div>' +
+        '<div class="os-pretitle">Kepada Yth.</div>' +
+        '<div class="os-guest">' + (guest||'Tamu Undangan') + '</div>' +
+        '<div class="os-from">dengan penuh cinta, dari</div>' +
+        '<div class="os-couple">' + groom + '<span class="os-couple-amp">' + themeIcon + '</span>' + bride + '</div>' +
+        '<div class="os-tap-zone" onclick="openInvitation()">' +
+          '<div class="os-ring"></div>' +
+          '<div class="os-ring2"></div>' +
+          '<div class="os-dot"><span class="os-dot-icon">' + themeIcon + '</span></div>' +
+          '<span class="os-tap-label">Buka Undangan</span>' +
+        '</div>' +
+        '<div class="os-line-bot"></div>' +
+      '</div>' +
+      '<button class="os-music-btn" id="osMusicBtn" onclick="toggleAmbient(event)">' +
+        '<div class="os-bars-mini" id="osBars"><span style=\"height:4px\"></span><span style=\"height:9px\"></span><span style=\"height:6px\"></span></div>' +
+        '<span id="osMusicLabel">Musik</span>' +
+      '</button>' +
+    '</div>'
+  );
+
+  // ── FULL IFRAME DOC ──
+  var doc = '<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+  '<link rel="preconnect" href="https://fonts.googleapis.com">' +
+  '<link href="'+gfonts+'" rel="stylesheet">' +
+  '<style>' +
+  '*{margin:0;padding:0;box-sizing:border-box;}' +
+  'html{scroll-behavior:smooth;}' +
+  'body{background:'+th.bg+';color:'+th.text+';font-family:'+th.bodyFont+';overflow-x:hidden;padding-bottom:'+(state.features.music?'60px':'0')+';animation:pageIn .6s ease both;}' +
+  'html{background:'+th.bg+';}' +
+
+  // ── CANVAS BG + OPENING SCREEN CSS ──
+  // Canvas animated background
+  '#cvs{position:fixed;inset:0;z-index:0;pointer-events:none;width:100vw;height:100vh;}' +
+
+  // Opening screen
+  '.opening-screen{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity 1s cubic-bezier(.4,0,.2,1),transform 1s cubic-bezier(.4,0,.2,1);}' +
+  '.opening-screen.opened{opacity:0;transform:scale(1.06) translateY(-12px);pointer-events:none;}' +
+  '.os-bg{position:absolute;inset:0;background:'+th.cover+';opacity:0.92;}' +
+  '.os-content{text-align:center;position:relative;z-index:2;padding:0 32px;}' +
+  '.os-line-top{width:1px;height:60px;background:'+th.accent+';opacity:.25;margin:0 auto 28px;animation:lineGrow 1.4s .2s cubic-bezier(.4,0,.2,1) both;}' +
+  '.os-pretitle{font-family:'+th.preFont+';font-size:8px;letter-spacing:5px;text-transform:uppercase;color:'+th.accent+';opacity:.6;margin-bottom:8px;animation:fadeUp .9s .4s ease both;}' +
+  '.os-guest{font-size:18px;font-style:italic;opacity:.7;margin-bottom:6px;color:'+th.text+';font-family:Georgia,serif;animation:fadeUp .9s .5s ease both;}' +
+  '.os-from{font-size:7px;letter-spacing:4px;text-transform:uppercase;color:'+th.accent+';opacity:.35;margin-bottom:10px;animation:fadeUp .9s .55s ease both;font-family:sans-serif;}' +
+  '.os-couple{font-family:'+th.nameFont+';font-size:30px;font-weight:'+th.nameFontWeight+';color:'+th.name+';line-height:1.12;margin-bottom:36px;animation:fadeUp .9s .6s ease both;}' +
+  '.os-couple-amp{color:'+th.accent+';font-size:22px;display:block;}' +
+  '.os-tap-zone{position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:10px;animation:fadeUp .9s .8s ease both;}' +
+  '.os-ring{width:80px;height:80px;border-radius:50%;border:1px solid '+th.accent+';opacity:.35;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);animation:ringExp 2.8s 1.2s ease-in-out infinite;}' +
+  '.os-ring2{width:80px;height:80px;border-radius:50%;border:1px solid '+th.accent+';opacity:.2;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);animation:ringExp 2.8s 1.8s ease-in-out infinite;}' +
+  '.os-dot{width:56px;height:56px;border-radius:50%;border:1px solid '+th.accent+';display:flex;align-items:center;justify-content:center;position:relative;}' +
+  '.os-dot-icon{font-size:18px;}' +
+  '.os-tap-label{font-family:'+th.preFont+';font-size:7px;letter-spacing:3px;text-transform:uppercase;color:'+th.accent+';opacity:.55;}' +
+  '.os-line-bot{width:1px;height:40px;background:'+th.accent+';opacity:.2;margin:20px auto 0;animation:lineGrow 1.4s .3s cubic-bezier(.4,0,.2,1) both;}' +
+
+  // music button on opening screen
+  '.os-music-btn{position:absolute;bottom:28px;right:24px;z-index:10;display:flex;align-items:center;gap:6px;font-family:sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:'+th.accent+';opacity:.5;cursor:pointer;transition:opacity .3s;background:none;border:none;padding:0;}' +
+  '.os-music-btn:hover{opacity:.85;}' +
+  '.os-bars-mini{display:flex;gap:2px;align-items:flex-end;height:12px;}' +
+  '.os-bars-mini span{width:2px;border-radius:1px;background:'+th.accent+';transition:height .1s;}' +
+  '.os-bars-mini.playing span:nth-child(1){animation:barA 1.1s ease-in-out infinite;}' +
+  '.os-bars-mini.playing span:nth-child(2){animation:barA 1.1s .15s ease-in-out infinite;}' +
+  '.os-bars-mini.playing span:nth-child(3){animation:barA 1.1s .3s ease-in-out infinite;}' +
+
+  // music player in invitation
+  '.music-player{position:fixed;bottom:0;left:0;right:0;padding:10px 16px;background:'+th.bg+'f2;backdrop-filter:blur(16px);border-top:1px solid '+th.accentBorder+';display:flex;align-items:center;gap:10px;z-index:100;}' +
+  '.mp-play{width:30px;height:30px;border-radius:50%;border:1px solid '+th.accentBorder+';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .3s;background:none;color:'+th.accent+';font-size:10px;}' +
+  '.mp-play:hover{background:'+th.accentDim+';}' +
+  '.mp-bars{display:flex;gap:2px;align-items:flex-end;height:16px;flex-shrink:0;}' +
+  '.mp-bars span{width:3px;border-radius:2px;background:'+th.accent+';opacity:.7;}' +
+  '.mp-bars.playing span:nth-child(1){animation:barA 1.0s .00s ease-in-out infinite;}' +
+  '.mp-bars.playing span:nth-child(2){animation:barA 1.0s .15s ease-in-out infinite;}' +
+  '.mp-bars.playing span:nth-child(3){animation:barA 1.0s .30s ease-in-out infinite;}' +
+  '.mp-bars.playing span:nth-child(4){animation:barA 1.0s .45s ease-in-out infinite;}' +
+  '.mp-bars span:nth-child(1){height:5px;} .mp-bars span:nth-child(2){height:12px;} .mp-bars span:nth-child(3){height:8px;} .mp-bars span:nth-child(4){height:10px;}' +
+  '.mp-title{flex:1;font-size:10px;opacity:.4;font-style:italic;}' +
+
+  '@keyframes barA{0%,100%{transform:scaleY(1);}50%{transform:scaleY(0.3);}}' +
+  '@keyframes burstFly{0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg);}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0.3) rotate(180deg);}}' +
+  '@keyframes lineGrow{from{transform:scaleY(0);}to{transform:scaleY(1);}}' +
+  '@keyframes ringExp{0%{transform:translate(-50%,-50%) scale(1);opacity:.35;}100%{transform:translate(-50%,-50%) scale(2.2);opacity:0;}}' +
+
+    // ── COVER ──
+  '.cover{min-height:100vh;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px 48px;position:relative;overflow:hidden;z-index:1;}' +
+  '.cover-guest-to{font-size:9px;letter-spacing:3px;text-transform:uppercase;opacity:0.4;margin-bottom:4px;animation:fadeDown 0.8s ease both;}' +
+  '.cover-guest{font-size:16px;font-style:italic;opacity:0.7;margin-bottom:28px;animation:fadeDown 0.8s 0.1s ease both;}' +
+  '.cover-pretitle{font-family:'+th.preFont+';font-size:9px;letter-spacing:4px;text-transform:uppercase;color:'+th.accent+';margin-bottom:16px;animation:fadeUp 0.9s 0.15s ease both;}' +
+  '.cover-names{font-family:'+th.nameFont+';font-weight:'+th.nameFontWeight+';font-size:'+th.nameFontSize+';letter-spacing:'+th.nameLetterSpacing+';text-transform:'+th.nameTransform+';color:'+th.name+';line-height:1.1;animation:fadeUp 0.9s 0.25s ease both;}' +
+  '.cover-amp{color:'+th.accent+';display:block;font-size:28px;margin:4px 0;animation:fadeUp 0.9s 0.3s ease both;}' +
+  '.cover-date{display:inline-block;margin-top:20px;padding:8px 20px;border:1px solid '+th.accent+';font-family:'+th.preFont+';font-size:9px;letter-spacing:3px;text-transform:uppercase;color:'+th.accent+';opacity:0.8;animation:fadeUp 0.9s 0.4s ease both;}' +
+  '.cover-scroll{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px;opacity:0;animation:fadeIn 1s 1.8s ease both;z-index:2;}' +
+  '.cover-scroll span{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:'+th.accent+';opacity:0.5;}' +
+  '.scroll-arrow{width:1px;height:24px;background:'+th.accent+';opacity:0.3;animation:scrollPulse 1.8s ease-in-out infinite;}' +
+
+  // ── PARTICLES ──
+  '.particle{position:absolute;pointer-events:none;opacity:0;animation:'+th.particleAnim+' var(--dur,6s) ease-in-out infinite;}' +
+  '@keyframes float-sparkle{0%,100%{opacity:0;transform:translateY(0) rotate(0deg);}20%,80%{opacity:0.25;}50%{transform:translateY(-20px) rotate(180deg);}}' +
+  '@keyframes float-petal{0%,100%{opacity:0;transform:translateY(0) rotate(-10deg);}30%,70%{opacity:0.3;}50%{transform:translateY(-16px) rotate(10deg);}}' +
+  '@keyframes float-heart{0%,100%{opacity:0;transform:translateY(0) scale(1);}20%,80%{opacity:0.2;}50%{transform:translateY(-18px) scale(1.2);}}' +
+  '@keyframes float-chrome{0%,100%{opacity:0;transform:translateY(0) rotate(0deg);}25%,75%{opacity:0.2;}50%{transform:translateY(-14px) rotate(90deg);}}' +
+  '@keyframes float-leaf{0%,100%{opacity:0;transform:translateY(0) rotate(-5deg);}30%,70%{opacity:0.25;}50%{transform:translateY(-12px) rotate(5deg);}}' +
+  '@keyframes float-minimal{0%,100%{opacity:0;transform:translateY(0);}25%,75%{opacity:0.12;}50%{transform:translateY(-10px);}}' +
+  '@keyframes float-vintage{0%,100%{opacity:0;transform:translateY(0) rotate(0deg);}25%,75%{opacity:0.18;}50%{transform:translateY(-16px) rotate(20deg);}}' +
+  '@keyframes float-star{0%,100%{opacity:0;transform:translateY(0) scale(0.8);}25%,75%{opacity:0.25;}50%{transform:translateY(-20px) scale(1.1);}}' +
+
+  // ── BODY SECTIONS ──
+  '.inv-body{padding:0 20px;position:relative;z-index:1;}' +
+  '.inv-section{padding:28px 0;position:relative;z-index:1;}' +
+  '.sec-lbl{text-align:center;margin-bottom:16px;position:relative;z-index:1;}' +
+  '.sec-lbl span{font-family:'+th.preFont+';font-size:8px;letter-spacing:4px;text-transform:uppercase;color:'+th.accent+';opacity:0.7;padding:4px 12px;border-bottom:1px solid '+th.accentBorder+';}' +
+  '.orn{display:block;text-align:center;font-size:12px;letter-spacing:8px;color:'+th.accent+';opacity:0.3;margin:12px 0;position:relative;z-index:1;}' +
+
+  // ── VERSE ──
+  '.verse{font-style:italic;font-size:13px;line-height:1.9;border-left:2px solid '+th.accent+';border-left-color:'+th.accentBorder.replace('0.2','0.4')+';padding-left:14px;text-align:left;opacity:0.75;margin:0 0 16px;}' +
+  '.verse-ref{font-size:10px;font-style:normal;opacity:0.45;display:block;margin-top:6px;letter-spacing:1px;}' +
+  '.inv-intro{font-size:12px;line-height:1.9;opacity:0.55;text-align:center;margin-bottom:0;}' +
+
+  // ── COUPLE ──
+  '.couple-grid{display:grid;grid-template-columns:1fr 28px 1fr;gap:8px;align-items:start;margin:12px 0;position:relative;z-index:1;}' +
+  '.couple-card{text-align:center;}' +
+  '.couple-name{font-family:'+th.nameFont+';font-size:15px;font-weight:'+th.nameFontWeight+';color:'+th.name+';margin-bottom:3px;}' +
+  '.couple-par{font-size:9px;line-height:1.7;opacity:0.5;}' +
+  '.couple-amp{display:flex;align-items:center;justify-content:center;padding-top:26px;font-family:'+th.nameFont+';font-size:28px;color:'+th.accent+';opacity:0.6;}' +
+
+  // ── EVENT ──
+  '.event-card{background:'+th.accentDim+';border:1px solid '+th.accentBorder+';border-radius:4px;padding:16px;margin:10px 0;text-align:center;backdrop-filter:blur(8px);}' +
+  '.ev-type{font-family:'+th.preFont+';font-size:8px;letter-spacing:3px;text-transform:uppercase;color:'+th.accent+';margin-bottom:6px;opacity:0.7;}' +
+  '.ev-date{font-family:'+th.nameFont+';font-size:17px;color:'+th.name+';margin-bottom:2px;}' +
+  '.ev-time{font-size:11px;font-style:italic;opacity:0.55;margin-bottom:5px;}' +
+  '.ev-venue{font-size:10px;line-height:1.7;opacity:0.55;}' +
+  '.maps-btn{display:inline-block;margin-top:10px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:'+th.accent+';text-decoration:none;border-bottom:1px solid '+th.accentBorder+';padding-bottom:2px;opacity:0.7;}' +
+
+  // ── COUNTDOWN ──
+  '.countdown{display:flex;justify-content:center;gap:10px;padding:8px 0;position:relative;z-index:1;}' +
+  '.cd-u{text-align:center;min-width:44px;}' +
+  '.cd-n{font-family:'+th.nameFont+';font-size:32px;font-weight:'+th.nameFontWeight+';color:'+th.name+';display:block;line-height:1;}' +
+  '.cd-l{font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:0.4;display:block;margin-top:3px;}' +
+  '.cd-sep{display:flex;align-items:center;padding-bottom:14px;font-size:22px;opacity:0.25;color:'+th.accent+';}' +
+
+  // ── GALLERY ──
+  '.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;position:relative;z-index:1;}' +
+  '.gal-item{aspect-ratio:3/4;background:'+th.accentDim+';border:1px dashed '+th.accentBorder+';display:flex;align-items:center;justify-content:center;font-size:18px;opacity:0;animation:galpop 0.5s ease both;}' +
+
+  // ── RSVP ──
+  '.rsvp-form{text-align:left;position:relative;z-index:1;}' +
+  '.rsvp-inp{width:100%;background:transparent;border:none;border-bottom:1px solid '+th.accentBorder+';color:'+th.text+';padding:9px 0;font-size:12px;font-family:'+th.bodyFont+';outline:none;margin-bottom:12px;opacity:0.7;}' +
+  '.rsvp-inp::placeholder{color:'+th.text+';opacity:0.4;}' +
+  '.rsvp-btn{padding:9px 22px;background:'+th.accentDim+';border:1px solid '+th.accentBorder+';color:'+th.accent+';font-family:'+th.preFont+';font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.3s;}' +
+  '.rsvp-btn:hover{opacity:0.8;}' +
+
+  // ── STORY ──
+  '.story{display:flex;flex-direction:column;gap:0;}' +
+  '.story-item{padding:14px 0 14px 16px;border-left:2px solid '+th.accentBorder+';position:relative;z-index:1;}' +
+  '.story-title{font-family:'+th.nameFont+';font-size:16px;color:'+th.name+';margin-bottom:5px;font-style:italic;}' +
+  '.story-text{font-size:11px;line-height:1.8;opacity:0.55;}' +
+
+  // ── WISHES ──
+  '.wishes{display:flex;flex-direction:column;gap:8px;}' +
+  '.wish-card{background:'+th.accentDim+';border:1px solid '+th.accentBorder+';border-radius:4px;padding:12px 14px;backdrop-filter:blur(8px);}' +
+  '.wish-msg{font-size:11px;line-height:1.7;opacity:0.75;margin-bottom:5px;}' +
+  '.wish-name{font-size:9px;letter-spacing:1px;text-transform:uppercase;opacity:0.4;}' +
+
+  // ── FOOTER ──
+  '.inv-footer{background:'+th.footer+';padding:36px 20px;text-align:center;margin-top:8px;position:relative;z-index:1;}' +
+  '.footer-names{font-family:'+th.nameFont+';font-size:'+th.nameFontSize+';font-weight:'+th.nameFontWeight+';color:'+th.name+';margin-bottom:8px;}' +
+  '.footer-amp{color:'+th.accent+';display:block;font-size:24px;margin:3px 0;}' +
+  '.footer-text{font-size:10px;line-height:1.9;opacity:0.4;}' +
+
+  // ── MUSIC BAR ──
+  '.music-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 16px;background:'+th.bg+'ee;backdrop-filter:blur(12px);border-top:1px solid '+th.accentBorder+';display:flex;align-items:center;gap:10px;z-index:100;}' +
+  '.music-bars{display:flex;gap:2px;align-items:flex-end;height:14px;}' +
+  '.music-bars span{width:3px;background:'+th.accent+';border-radius:2px;animation:bar 1.1s ease-in-out infinite;opacity:0.7;}' +
+  '.music-bars span:nth-child(1){height:6px;animation-delay:0s;}' +
+  '.music-bars span:nth-child(2){height:12px;animation-delay:0.15s;}' +
+  '.music-bars span:nth-child(3){height:8px;animation-delay:0.3s;}' +
+  '.music-bars span:nth-child(4){height:10px;animation-delay:0.45s;}' +
+  '@keyframes bar{0%,100%{transform:scaleY(1);}50%{transform:scaleY(0.4);}}' +
+  '.music-title{flex:1;font-size:10px;opacity:0.45;font-style:italic;}' +
+
+  // ── REVEAL ANIMATIONS ──
+  '.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.65s ease,transform 0.65s ease;}' +
+  '.reveal.visible{opacity:1;transform:translateY(0);}' +
+  '.gal-item.visible{opacity:1;}' +
+
+  // ── GLOBAL ANIMS ──
+  '@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}' +
+  '@keyframes pageIn{from{opacity:0;}to{opacity:1;}}' +
+  '@keyframes fadeDown{from{opacity:0;transform:translateY(-16px);}to{opacity:1;transform:translateY(0);}}' +
+  '@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}' +
+  '@keyframes scrollPulse{0%,100%{opacity:0.3;transform:scaleY(1);}50%{opacity:0.7;transform:scaleY(1.4);}}' +
+  '</style></head><body>' +
+
+  // ── COVER ──
+  '<div class="cover">' +
+    makeParticles(12) +
+    '<div class="cover-guest-to">Kepada Yth.</div>' +
+    '<div class="cover-guest">'+(guest||'Tamu Undangan')+'</div>' +
+    '<div class="cover-pretitle">The Wedding of</div>' +
+    '<div class="cover-names">'+groom+'<span class="cover-amp">&</span>'+bride+'</div>' +
+    (rDate ? '<div class="cover-date">'+rDate+'</div>' : '') +
+    '<div class="cover-scroll"><span>Geser ke bawah</span><div class="scroll-arrow"></div></div>' +
+  '</div>' +
+
+  // ── BODY ──
+  '<div class="inv-body">' +
+
+    '<div class="inv-section reveal">' +
+      '<span class="orn">'+th.orn+'</span>' +
+      '<blockquote class="verse">'+verse+'<span class="verse-ref">— '+verseRef+'</span></blockquote>' +
+      '<p class="inv-intro">Dengan penuh rasa syukur, kami mengundang Bapak / Ibu / Saudara/i untuk hadir dalam pemberkatan pernikahan kami.</p>' +
+    '</div>' +
+
+    '<div class="inv-section reveal" id="inv-couple-section">' +
+      '<div class="sec-lbl"><span>👫 Mempelai</span></div>' +
+      '<div class="couple-grid">' +
+        '<div class="couple-card">'+photoG+'<div class="couple-name">'+groom+'</div><div class="couple-par">Putra dari<br>'+groomDad+'<br>'+groomMom+'</div></div>' +
+        '<div class="couple-amp">&</div>' +
+        '<div class="couple-card">'+photoB+'<div class="couple-name">'+bride+'</div><div class="couple-par">Putri dari<br>'+brideDad+'<br>'+brideMom+'</div></div>' +
+      '</div>' +
+    '</div>' +
+
+    '<span class="orn reveal">'+th.orn+'</span>' +
+
+    '<div class="inv-section reveal" id="inv-event-section">' +
+      '<div class="sec-lbl"><span>📅 Rangkaian Acara</span></div>' +
+      '<div class="event-card">' +
+        '<div class="ev-type">⛪ Pemberkatan / Akad</div>' +
+        (cDate ? '<div class="ev-date">'+cDate+'</div>' : '<div class="ev-date" style="opacity:0.3;font-size:12px;font-style:italic">Tanggal belum diisi</div>') +
+        (cTime ? '<div class="ev-time">'+cTime+cTZ+'</div>' : '<div class="ev-time" style="opacity:0.25;font-style:italic">Waktu belum diisi</div>') +
+        '<div class="ev-venue">'+cVenue+'<br>'+cAddr+'</div>' +
+        mapsLink +
+      '</div>' +
+      '<div class="event-card">' +
+        '<div class="ev-type">🥂 Resepsi</div>' +
+        (rDate ? '<div class="ev-date">'+rDate+'</div>' : '<div class="ev-date" style="opacity:0.3;font-size:12px;font-style:italic">Tanggal belum diisi</div>') +
+        (rTime ? '<div class="ev-time">'+rTime+rTZ+'</div>' : '<div class="ev-time" style="opacity:0.25;font-style:italic">Waktu belum diisi</div>') +
+        '<div class="ev-venue">'+rVenue+'<br>'+rAddr+'</div>' +
+        rMapsLink +
+      '</div>' +
+    '</div>' +
+
+    cdHtml +
+    storyHtml +
+    galHtml +
+    rsvpHtml +
+    wishHtml +
+
+  '</div>' +
+
+  '<div class="inv-footer">' +
+    '<div class="footer-names">'+groom+'<span class="footer-amp">&</span>'+bride+'</div>' +
+    '<span class="orn">'+th.orn+'</span>' +
+    '<div class="footer-text">Kehadiran dan doa restu Bapak / Ibu / Saudara/i<br>adalah anugerah terindah bagi kami.<br><br>Terima kasih 🙏</div>' +
+  '</div>' +
+
+  musicHtml +
+
+  // ── SCRIPTS inside iframe ──
+  '<script>' +
+  // Theme + YouTube config injected dynamically
+  'var THEME="' + t + '";' +
+  'var YT_ID="' + YOUTUBE_IDS.get(t, 'jfKfPfyJRdk') + '";' +
+  'var CV_TYPE="' + {
+      'aesthetic':'orbs','cottagecore':'petals','darkromance':'hearts',
+      'y2k':'grid','bali':'leaves','minimalist':'lines','vintage':'orbs','celestial':'stars'
+  }.get(t,'orbs') + '";' +
+  'var CV_COLORS=' + str({
+      'aesthetic':['#6a0dad','#3d1f7a','#9b4dca'],
+      'cottagecore':['#4a2800','#8b5a00','#c8a050'],
+      'darkromance':['#5a0015','#8b001f','#cc2244'],
+      'y2k':['#001a40','#003380','#0055cc'],
+      'bali':['#0a200a','#1a4a1a','#2d7a2d'],
+      'minimalist':['#c0bdb8','#a8a5a0','#909090'],
+      'vintage':['#2a1800','#5a3800','#8a5800'],
+      'celestial':['#05071a','#0d1230','#1a1f50'],
+  }.get(t, ['#222','#333','#444'])) + ';' +
+
+  // ── CANVAS FLUID BACKGROUND ──
+  '(function(){' +
+    'var cvs=document.getElementById("cvs");' +
+    'if(!cvs)return;' +
+    'var ctx=cvs.getContext("2d");' +
+    'var W,H,orbs=[],tick=0;' +
+    'function resize(){W=cvs.width=window.innerWidth;H=cvs.height=window.innerHeight;}' +
+    'resize();window.addEventListener("resize",resize);' +
+
+    // init orbs / shapes
+    'for(var i=0;i<18;i++){' +
+      'orbs.push({' +
+        'x:Math.random()*1400,' +
+        'y:Math.random()*900,' +
+        'r:60+Math.random()*180,' +
+        'vx:(Math.random()-.5)*0.35,' +
+        'vy:(Math.random()-.5)*0.35,' +
+        'ci:Math.floor(Math.random()*CV_COLORS.length),' +
+        'phase:Math.random()*Math.PI*2,' +
+        'speed:0.003+Math.random()*0.005' +
+      '});' +
+    '}' +
+
+    'function hexToRgb(h){' +
+      'var r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);' +
+      'return r+","+g+","+b;' +
+    '}' +
+
+    'function draw(){' +
+      'tick++;' +
+      'ctx.clearRect(0,0,W,H);' +
+
+      // each orb: smooth float + breathe
+      'orbs.forEach(function(o){' +
+        'o.phase+=o.speed;' +
+        'o.x+=o.vx+Math.sin(o.phase)*0.3;' +
+        'o.y+=o.vy+Math.cos(o.phase*0.7)*0.25;' +
+        // wrap
+        'if(o.x<-o.r)o.x=W+o.r;if(o.x>W+o.r)o.x=-o.r;' +
+        'if(o.y<-o.r)o.y=H+o.r;if(o.y>H+o.r)o.y=-o.r;' +
+        // breathe radius
+        'var br=o.r*(0.85+0.15*Math.sin(o.phase*1.3));' +
+        'var grad=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,br);' +
+        'var rgb=hexToRgb(CV_COLORS[o.ci]);' +
+        'grad.addColorStop(0,"rgba("+rgb+",0.18)");' +
+        'grad.addColorStop(0.5,"rgba("+rgb+",0.07)");' +
+        'grad.addColorStop(1,"rgba("+rgb+",0)");' +
+        'ctx.fillStyle=grad;' +
+        'ctx.beginPath();ctx.arc(o.x,o.y,br,0,Math.PI*2);ctx.fill();' +
+      '});' +
+
+      // subtle grain overlay via tiny rects - skip for performance, use CSS instead
+      'requestAnimationFrame(draw);' +
+    '}' +
+    'draw();' +
+  '})();' +
+
+  // ── YOUTUBE AMBIENT MUSIC (hidden iframe) ──
+  '(function(){' +
+    'var playing=false;' +
+    'var ytFrame=null;' +
+    'var btn=document.getElementById("osMusicBtn");' +
+    'var bars=document.getElementById("osBars");' +
+    'var mpBtn=document.getElementById("mpPlayBtn");' +
+    'var mpBars=document.getElementById("mpBars");' +
+    'var mpTitle=document.getElementById("mpTitle");' +
+
+    'function createYT(){' +
+      'if(ytFrame)return;' +
+      'var div=document.createElement("div");' +
+      'div.id="yt-player";' +
+      'div.style.cssText="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;";' +
+      'document.body.appendChild(div);' +
+      'var s=document.createElement("script");' +
+      's.src="https://www.youtube.com/iframe_api";' +
+      'document.head.appendChild(s);' +
+    '}' +
+
+    'window.onYouTubeIframeAPIReady=function(){' +
+      'ytFrame=new YT.Player("yt-player",{' +
+        'videoId:YT_ID,' +
+        'playerVars:{autoplay:1,loop:1,playlist:YT_ID,controls:0,mute:0,start:30},' +
+        'events:{' +
+          'onReady:function(e){' +
+            'e.target.setVolume(55);' +
+            'e.target.playVideo();' +
+            'playing=true;' +
+            'updateUI();' +
+          '}' +
+        '}' +
+      '});' +
+    '};' +
+
+    'function updateUI(){' +
+      'if(bars)bars.className="os-bars-mini"+(playing?" playing":"");' +
+      'if(mpBars)mpBars.className="mp-bars"+(playing?" playing":"");' +
+      'var lbl=document.getElementById("osMusicLabel");' +
+      'if(lbl)lbl.textContent=playing?"Musik":"Mute";' +
+      'var mpIcon=document.getElementById("mpIcon");' +
+      'if(mpIcon)mpIcon.textContent=playing?"⏸":"▶";' +
+    '}' +
+
+    'window.toggleAmbient=function(e){' +
+      'if(e)e.stopPropagation();' +
+      'if(!ytFrame){createYT();return;}' +
+      'if(playing){ytFrame.pauseVideo();playing=false;}' +
+      'else{ytFrame.playVideo();playing=true;}' +
+      'updateUI();' +
+    '};' +
+
+    'window.toggleMusic=function(){' +
+      'if(!ytFrame){createYT();playing=true;updateUI();return;}' +
+      'if(playing){ytFrame.pauseVideo();playing=false;}' +
+      'else{ytFrame.playVideo();playing=true;}' +
+      'updateUI();' +
+    '};' +
+
+    // Auto-start on first user interaction (opening screen tap)
+    'document.addEventListener("click",function(){' +
+      'if(!ytFrame){createYT();}' +
+    '},{once:true});' +
+
+  '})();' +
+
+  // ── OPENING SCREEN ──
+  'function openInvitation(){' +
+    'var s=document.getElementById("openScreen");' +
+    'if(!s)return;' +
+    'var chars=' + JSON.stringify(th.particles.slice(0,3)) + ';' +
+    'for(var i=0;i<20;i++){' +
+      'var p=document.createElement("div");' +
+      'var tx=(Math.random()*240-120);' +
+      'var ty=(Math.random()*-220-40);' +
+      'p.style.cssText="position:fixed;z-index:1000;pointer-events:none;font-size:"+(10+Math.random()*14)+"px;left:"+(20+Math.random()*60)+"%;top:"+(20+Math.random()*60)+"%;--tx:"+tx+"px;--ty:"+ty+"px;animation:burstFly 1.2s ease-out forwards;";' +
+      'p.textContent=chars[i%chars.length];' +
+      'document.body.appendChild(p);' +
+      'setTimeout((function(el){return function(){el.remove();};})(p),1400);' +
+    '}' +
+    's.classList.add("opened");' +
+    'setTimeout(function(){s.style.display="none";},1000);' +
+  '}' +
+  // ── SCROLL REVEAL ──
+  '(function(){' +
+    'var obs=new IntersectionObserver(function(entries){' +
+      'entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add("visible");});' +
+    '},{threshold:0.12});' +
+    'document.querySelectorAll(".reveal,.gal-item").forEach(function(el){obs.observe(el);});' +
+  '})();' +
+
+  // ── LIVE COUNTDOWN ──
+  (cd ? '(function(){' +
+    'var target=new Date("'+(v('receptionDate')||'')+'T'+(v('receptionTime','18:00'))+'");' +
+    'function tick(){' +
+      'var diff=target-new Date();if(diff<0)diff=0;' +
+      'function pad(n){return String(Math.floor(n)).padStart(2,"0");}' +
+      'var el;' +
+      'el=document.getElementById("cd-d");if(el)el.textContent=pad(diff/86400000);' +
+      'el=document.getElementById("cd-h");if(el)el.textContent=pad((diff%86400000)/3600000);' +
+      'el=document.getElementById("cd-m");if(el)el.textContent=pad((diff%3600000)/60000);' +
+      'el=document.getElementById("cd-s");if(el)el.textContent=pad((diff%60000)/1000);' +
+    '}' +
+    'tick();setInterval(tick,1000);' +
+  '})();' : '') +
+  '<\/script>' +
+
+  '</body></html>';
+
+  // ── INJECT into iframe ──
+  var iframe = document.getElementById('screen');
+
+  // smooth theme transition: fade out → swap → fade in
+  if (themeChanged) {
+    iframe.style.opacity = '0';
+    iframe.style.transition = 'opacity 0.3s ease';
+    setTimeout(function() {
+      iframe.srcdoc = doc;
+      iframe.style.opacity = '1';
+    }, 280);
+  } else {
+    // preserve scroll position on content updates
+    var prevScroll = 0;
+    try { prevScroll = iframe.contentWindow.scrollY || 0; } catch(e){}
+    iframe.srcdoc = doc;
+    // restore scroll after load
+    iframe.onload = function() {
+      try { iframe.contentWindow.scrollTo(0, prevScroll); } catch(e){}
+      iframe.onload = null;
+    };
+  }
+}
+
+// ── SUMMARY ──
+function updateSummary() {
+  var groom = v('groomName','—'); var bride = v('brideName','—');
+  var rDate = fmtDate(v('receptionDate'));
+  var themeNames2 = {aesthetic:'Aesthetic',cottagecore:'Cottagecore',darkromance:'Dark Romance',y2k:'Y2K',bali:'Bali Garden',minimalist:'Minimalist',vintage:'Vintage Gold',celestial:'Celestial'};
+  var activeF = Object.keys(state.features).filter(function(k){return state.features[k];}).map(function(k){
+    return {countdown:'Countdown',gallery:'Galeri',rsvp:'RSVP',wishes:'Ucapan',music:'Musik',maps:'Maps'}[k];
+  }).join(', ');
+  document.getElementById('summary-box').innerHTML =
+    'Tema: <b style="color:var(--sub)">'+themeNames2[state.theme]+'</b><br>' +
+    'Pasangan: <b style="color:var(--sub)">'+groom+' & '+bride+'</b><br>' +
+    'Resepsi: <b style="color:var(--sub)">'+(rDate||'Belum diisi')+'</b><br>' +
+    'Fitur: <b style="color:var(--sub)">'+activeF+'</b>';
+}
+
+// ── DOWNLOAD ──
+function downloadHTML() {
+  var iframe = document.getElementById('screen');
+  var html = iframe.srcdoc || '';
+  var groom = v('groomName','pasangan');
+  var bride = v('brideName','bahagia');
+  var blob = new Blob([html], {type:'text/html'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'undangan-'+groom.toLowerCase().replace(/\s+/g,'-')+'-'+bride.toLowerCase().replace(/\s+/g,'-')+'.html';
+  a.click();
+}
+
+function toggleFullPreview() {
+  // "Lihat seperti tamu" — open guest mode overlay
+  var iframe = document.getElementById('screen');
+  var src = iframe.srcdoc || '';
+  if (!src) { render(); setTimeout(toggleFullPreview, 200); return; }
+  var gf = document.getElementById('guestIframe');
+  gf.srcdoc = src;
+  var overlay = document.getElementById('guestOverlay');
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeGuestMode() {
+  document.getElementById('guestOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function copyShareLink() {
+  navigator.clipboard.writeText('https://invitely.id/preview/my-wedding').then(function(){
+    alert('Link disalin!');
+  }).catch(function(){});
+}
+
+function scrollTo_(id) {
+  var iframe = document.getElementById('screen');
+  try {
+    var el = iframe.contentWindow.document.querySelector(id);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  } catch(e) {}
+}
+
+// ── INIT ──
+render();
+
+</script>
+</body>
+</html>
