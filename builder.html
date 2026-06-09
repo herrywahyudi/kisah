@@ -1684,69 +1684,62 @@ function _doRender() {
     'draw();' +
   '})();' +
 
-  // ── YOUTUBE AMBIENT MUSIC (hidden iframe) ──
+  // ── YOUTUBE MUSIC — plain hidden iframe embed (no API, no CORS) ──
   '(function(){' +
     'var playing=false;' +
-    'var ytFrame=null;' +
-    'var btn=document.getElementById("osMusicBtn");' +
-    'var bars=document.getElementById("osBars");' +
-    'var mpBtn=document.getElementById("mpPlayBtn");' +
-    'var mpBars=document.getElementById("mpBars");' +
-    'var mpTitle=document.getElementById("mpTitle");' +
+    'var ytIframe=null;' +
 
-    'function createYT(){' +
-      'if(ytFrame)return;' +
-      'var div=document.createElement("div");' +
-      'div.id="yt-player";' +
-      'div.style.cssText="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;";' +
-      'document.body.appendChild(div);' +
-      'var s=document.createElement("script");' +
-      's.src="https://www.youtube.com/iframe_api";' +
-      'document.head.appendChild(s);' +
+    'function buildSrc(id,vol){' +
+      // YouTube embed URL — autoplay=1, loop=1, no controls, mute=0
+      // enablejsapi=0 intentionally — we don't need the API, avoids postMessage
+      'return "https://www.youtube.com/embed/"+id+"?autoplay=1&loop=1&playlist="+id+"&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&enablejsapi=0&start=10";' +
     '}' +
 
-    'window.onYouTubeIframeAPIReady=function(){' +
-      'ytFrame=new YT.Player("yt-player",{' +
-        'videoId:YT_ID,' +
-        'playerVars:{autoplay:1,loop:1,playlist:YT_ID,controls:0,mute:0,start:30,origin:window.location.href.split("/").slice(0,3).join("/")||"https://herrywahyudi.github.io"},' +
-        'events:{' +
-          'onReady:function(e){' +
-            'e.target.setVolume(55);' +
-            'e.target.playVideo();' +
-            'playing=true;' +
-            'updateUI();' +
-          '}' +
-        '}' +
-      '});' +
-    '};' +
+    'function createPlayer(){' +
+      'if(ytIframe)return;' +
+      'ytIframe=document.createElement("iframe");' +
+      'ytIframe.id="yt-embed";' +
+      'ytIframe.allow="autoplay";' +
+      'ytIframe.style.cssText="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;border:none;";' +
+      'ytIframe.src=buildSrc(YT_ID);' +
+      'document.body.appendChild(ytIframe);' +
+      'playing=true;' +
+      'updateUI();' +
+    '}' +
+
+    'function destroyPlayer(){' +
+      'if(!ytIframe)return;' +
+      // Stop by clearing src — only clean way without API
+      'ytIframe.src="about:blank";' +
+      'ytIframe.remove();' +
+      'ytIframe=null;' +
+      'playing=false;' +
+      'updateUI();' +
+    '}' +
 
     'function updateUI(){' +
+      'var bars=document.getElementById("osBars");' +
       'if(bars)bars.className="os-bars-mini"+(playing?" playing":"");' +
+      'var mpBars=document.getElementById("mpBars");' +
       'if(mpBars)mpBars.className="mp-bars"+(playing?" playing":"");' +
       'var lbl=document.getElementById("osMusicLabel");' +
-      'if(lbl)lbl.textContent=playing?"Musik":"Mute";' +
+      'if(lbl)lbl.textContent=playing?"♪":"♪";' +
       'var mpIcon=document.getElementById("mpIcon");' +
       'if(mpIcon)mpIcon.textContent=playing?"⏸":"▶";' +
     '}' +
 
     'window.toggleAmbient=function(e){' +
-      'if(e)e.stopPropagation();' +
-      'if(!ytFrame){createYT();return;}' +
-      'if(playing){ytFrame.pauseVideo();playing=false;}' +
-      'else{ytFrame.playVideo();playing=true;}' +
-      'updateUI();' +
+      'if(e){e.stopPropagation();e.preventDefault();}' +
+      'if(playing){destroyPlayer();}else{createPlayer();}' +
     '};' +
 
     'window.toggleMusic=function(){' +
-      'if(!ytFrame){createYT();playing=true;updateUI();return;}' +
-      'if(playing){ytFrame.pauseVideo();playing=false;}' +
-      'else{ytFrame.playVideo();playing=true;}' +
-      'updateUI();' +
+      'if(playing){destroyPlayer();}else{createPlayer();}' +
     '};' +
 
-    // Auto-start on first user interaction (opening screen tap)
+    // Start music automatically on first tap (opening screen)
     'document.addEventListener("click",function(){' +
-      'if(!ytFrame){createYT();}' +
+      'if(!ytIframe)createPlayer();' +
     '},{once:true});' +
 
   '})();' +
